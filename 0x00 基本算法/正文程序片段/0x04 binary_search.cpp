@@ -17,7 +17,7 @@ while (l + eps < r) {
 }
 
 // 实数域二分，规定循环次数法
-for (int i = 0; i < 100; i++) {
+for (int i = 0; i < 100; i ++ ) {
   double mid = (l + r) / 2;
   if (calc(mid)) r = mid; else l = mid;	
 }
@@ -25,9 +25,9 @@ for (int i = 0; i < 100; i++) {
 // 把n本书分成m组，每组厚度之和<=size，是否可行
 bool valid(int size) {
   int group = 1, rest = size;
-  for (int i = 1; i <= n; i++) {
+  for (int i = 1; i <= n; i ++ ) {
     if (rest >= a[i]) rest -= a[i];
-    else group++, rest = size - a[i];
+    else group ++ , rest = size - a[i];
   }
   return group <= m;
 }

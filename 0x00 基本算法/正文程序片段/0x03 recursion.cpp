@@ -2,7 +2,7 @@
 vector<int> chosen;
 void calc(int x) {
   if (x == n + 1) {
-    for (int i = 0; i < chosen.size(); i++)
+    for (int i = 0; i < chosen.size(); i ++ )
       printf("%d ", chosen[i]);
     puts("");
     return;
@@ -18,7 +18,7 @@ vector<int> chosen;
 void calc(int x) {
   if (chosen.size() > m || chosen.size() + (n - x + 1) < m) return;
   if (x == n + 1) {
-    for (int i = 0; i < chosen.size(); i++)
+    for (int i = 0; i < chosen.size(); i ++ )
       printf("%d ", chosen[i]);
     puts("");
     return;
@@ -34,12 +34,12 @@ int order[20];
 bool chosen[20];
 void calc(int k) {
   if (k == n + 1) {
-    for (int i = 1; i <= n; i++)
+    for (int i = 1; i <= n; i ++ )
       printf("%d ", order[i]);
     puts("");
     return;
   }
-  for (int i = 1; i <= n; i++) {
+  for (int i = 1; i <= n; i ++ ) {
     if (chosen[i]) continue;
     order[k] = i;
     chosen[i] = 1;
@@ -56,9 +56,9 @@ int stack[100010], top = 0, address = 0;
 
 void call(int x, int ret_addr) { // 模拟计算机汇编指令call
   int old_top = top;
-  stack[++top] = x; // 参数x
-  stack[++top] = ret_addr; // 返回地址标号
-  stack[++top] = old_top; // 在栈顶记录以前的top值
+  stack[ ++ top] = x; // 参数x
+  stack[ ++ top] = ret_addr; // 返回地址标号
+  stack[ ++ top] = old_top; // 在栈顶记录以前的top值
 }
 
 int ret() { // 模拟计算机汇编指令ret
@@ -80,7 +80,7 @@ int main() {
         continue;
       }
       if (x == n + 1) {
-        for (int i = 0; i < chosen.size(); i++)
+        for (int i = 0; i < chosen.size(); i ++ )
           printf("%d ", chosen[i]);
         puts("");
         address = ret(); // return
