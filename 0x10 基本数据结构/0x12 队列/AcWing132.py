@@ -1,12 +1,12 @@
 from collections import deque
 
 N, T = 1000000, 1006
-t, f, _id, q = 0, [0]*N, 0, [0]*T
+t, f, _id, q = 0, [0] * N, 0, [0] * T
 
 def Team_Queue():
     global t, f, _id, q
     q[0] = deque()
-    for i in range(1, t+1):
+    for i in range(1, t + 1):
         _, *rest = [int(x) for x in input().split()]
         for x in rest: f[x] = i
         q[i] = deque()

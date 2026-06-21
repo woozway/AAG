@@ -1,13 +1,13 @@
 N = 100006
-p = [[0]*4 for _ in range(N)] # d, prv, nxt, th
-h = [[0]*2 for _ in range(N)] # D, tp
+p = [[0] * 4 for _ in range(N)] # d, prv, nxt, th
+h = [[0] * 2 for _ in range(N)] # D, tp
 tot = 0
 
 def up(i):
     while i > 1:
-        if h[i][0] < h[i>>1][0]:
-            h[i], h[i>>1] = h[i>>1], h[i]
-            p[h[i][1]][3], p[h[i>>1][1]][3] = p[h[i>>1][1]][3], p[h[i][1]][3]
+        if h[i][0] < h[i >> 1][0]:
+            h[i], h[i >> 1] = h[i >> 1], h[i]
+            p[h[i][1]][3], p[h[i >> 1][1]][3] = p[h[i >> 1][1]][3], p[h[i][1]][3]
             i >>= 1
         else: return
 
@@ -15,7 +15,7 @@ def down(i):
     global tot
     ii = i << 1
     while ii <= tot:
-        if ii<tot and h[ii][0]>h[ii+1][0]: ii += 1
+        if ii < tot and h[ii][0] > h[ii + 1][0]: ii += 1
         if h[ii][0] < h[i][0]:
             h[ii], h[i] = h[i], h[ii]
             p[h[ii][1]][3], p[h[i][1]][3] = p[h[i][1]][3], p[h[ii][1]][3]
@@ -39,7 +39,7 @@ def main():
     pre = int(input())
     for i in range(1, n):
         w = int(input())
-        tot += 1; p[i] = [w-pre, i-1, i+1, tot]
+        tot += 1; p[i] = [w - pre, i - 1, i + 1, tot]
         pre = w
         h[tot] = [p[i][0], i]
         up(tot)
@@ -47,7 +47,7 @@ def main():
     for _ in range(k):
         ans += h[1][0]
         tp0 = h[1][1]
-        if not p[tp0][1] or p[tp0][2]==n:
+        if not p[tp0][1] or p[tp0][2] == n:
             if not p[tp0][1]:
                 DeH(p[p[tp0][2]][3])
                 DeL(p[tp0][2])

@@ -4,9 +4,9 @@ int trie[SIZE][26], tot = 1;
 // Trie的插入
 void insert(char* str) {
   int len = strlen(str), p = 1; // 令一个指针p起初指向根节点
-  for (int k = 0; k < len; k++) {
+  for (int k = 0; k < len; k ++ ) {
     int ch = str[k] - 'a';
-    if (trie[p][ch] == 0) trie[p][ch] = ++tot;
+    if (trie[p][ch] == 0) trie[p][ch] = ++ tot;
     p = trie[p][ch];
   }
   end[p] = true; // 标记字符串末尾
@@ -15,7 +15,7 @@ void insert(char* str) {
 // Trie的检索
 bool search(char* str) {
   int len = strlen(str), p = 1;
-  for (int k = 0; k < len; k++) {
+  for (int k = 0; k < len; k ++ ) {
     p = trie[p][str[k] - 'a'];
     if (p == 0) return false;
   }

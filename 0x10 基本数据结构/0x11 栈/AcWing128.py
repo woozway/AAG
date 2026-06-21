@@ -1,6 +1,6 @@
 from math import inf
 N = 1000006
-st1, st2, s, f = [0]*N, [0]*N, [0]*N, [0]*N
+st1, st2, s, f = [0] * N, [0] * N, [0] * N, [0] * N
 
 def Editor(q):
     t1, t2 = 0, 0
@@ -8,8 +8,8 @@ def Editor(q):
         c = input().split()
         if c[0] == 'I':
             t1 += 1; st1[t1] = int(c[1])
-            s[t1] = s[t1-1] + st1[t1]
-            f[t1] = max(f[t1-1], s[t1])
+            s[t1] = s[t1 - 1] + st1[t1]
+            f[t1] = max(f[t1 - 1], s[t1])
             continue
         elif c[0] == 'D':
             if t1: t1 -= 1
@@ -20,8 +20,8 @@ def Editor(q):
         elif c[0] == 'R':
             if not t2: continue
             t1 += 1; st1[t1] = st2[t2]; t2 -= 1
-            s[t1] = s[t1-1] + st1[t1]
-            f[t1] = max(f[t1-1], s[t1])
+            s[t1] = s[t1 - 1] + st1[t1]
+            f[t1] = max(f[t1 - 1], s[t1])
             continue
         else:
             k = int(c[1])

@@ -1,5 +1,5 @@
 N = 1000006
-trie, tot, s = [[0]*27 for _ in range(N)], 1, ""
+trie, tot, s = [[0] * 27 for _ in range(N)], 1, ""
 
 def add():
     global tot, s
@@ -14,7 +14,7 @@ def get():
     global s
     ans, len_, p = 0, len(s), 1
     for i in range(len_):
-        p = trie[p][ord(s[i])-ord('a')+1]
+        p = trie[p][ord(s[i]) - ord('a') + 1]
         ans += trie[p][0]
     print(ans)
     

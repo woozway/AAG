@@ -35,7 +35,7 @@ def main():
     p[1 : n + 1] = sorted(p[1 : n + 1], key=lambda x: x[0] * x[1])
     k[1] = 1
     gj1(p[0][0])
-    for i in range(1, n+1):
+    for i in range(1, n + 1):
         gj2(p[i][1])
         if pd():
             ans = ans0[:]

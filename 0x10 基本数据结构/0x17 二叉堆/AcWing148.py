@@ -8,7 +8,7 @@ def main():
     while len(q) != 1:
         x, y = heappop(q), heappop(q)
         ans += x + y
-        heappush(q, x+y)
+        heappush(q, x + y)
     print(ans)
     
 main()

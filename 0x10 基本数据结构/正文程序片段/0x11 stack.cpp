@@ -1,16 +1,16 @@
 // 递归法求中缀表达式的值，O(n^2)
 int calc(int l, int r) {
-  // 寻找未被任何括号包含的最后一个加减号。j=0表示肯定在括号外面，因为j--和j++对应
-  for (int i = r, j = 0; i >= l; i--) {
-    if (s[i] == '(') j++;
-    if (s[i] == ')') j--;
+  // 寻找未被任何括号包含的最后一个加减号。j=0 表示肯定在括号外面，因为 j-- 和 j++ 对应
+  for (int i = r, j = 0; i >= l; i -- ) {
+    if (s[i] == '(') j ++ ;
+    if (s[i] == ')') j -- ;
     if (j == 0 && s[i] == '+') return calc(l, i - 1) + calc(i + 1, r);
     if (j == 0 && s[i] == '-') return calc(l, i - 1) - calc(i + 1, r);
   }
   // 寻找未被任何括号包含的最后一个乘除号。这里先找+-再*/因为后者优先级更高
-  for (int i = r, j = 0; i >= l; i--) {
-    if (s[i] == '(') j++;
-    if (s[i] == ')') j--;
+  for (int i = r, j = 0; i >= l; i -- ) {
+    if (s[i] == '(') j ++ ;
+    if (s[i] == ')') j -- ;
     if (j == 0 && s[i] == '*') return calc(l, i - 1) * calc(i + 1, r);
     if (j == 0 && s[i] == '/') return calc(l, i - 1) / calc(i + 1, r);
   }
@@ -18,7 +18,7 @@ int calc(int l, int r) {
   if (s[l] == '(' && s[r] == ')') return calc(l + 1, r - 1);
   // 是一个数
   int ans = 0;
-  for (int i = l; i <= r; i++) ans = ans * 10 + s[i] - '0';
+  for (int i = l; i <= r; i ++ ) ans = ans * 10 + s[i] - '0';
   return ans;
 }
 
@@ -63,11 +63,11 @@ int solve(string s) {
   nums.clear();
   ops.clear();
   int top = 0, val = 0;
-  for (int i = 0; i < s.size(); i++) {
+  for (int i = 0; i < s.size(); i ++ ) {
     // 中缀表达式的一个数字 
     if (s[i] >= '0' && s[i] <= '9') {
       val = val * 10 + s[i] - '0';
-      if (s[i+1] >= '0' && s[i+1] <= '9') continue;
+      if (s[i + 1] >= '0' && s[i + 1] <= '9') continue;
       // 后缀表达式的一个数，直接入栈 
       nums.push_back(val);
       val = 0;
@@ -103,16 +103,16 @@ int solve(string s) {
 // ----------------------------------------------------
 // 单调栈
 a[n + 1] = p = 0; // 首末尾增加高度为0的矩形，以免扫描结束后栈中有剩余
-for (int i = 1; i <= n + 1; i++) {
+for (int i = 1; i <= n + 1; i ++ ) {
   if (a[i] > s[p]) {
-    s[++p] = a[i], w[p] = 1; // s是栈，p是栈顶指针top，w[p]是对应矩阵宽度
+    s[ ++ p] = a[i], w[p] = 1; // s是栈，p是栈顶指针top，w[p]是对应矩阵宽度
   } else {
     int width = 0;
     while (s[p] > a[i]) { // 这里必须是>，否则因为a[n+1]=0时会越界
       width += w[p];
       ans = max(ans, (long long)width * s[p]);
-      p--;
+      p -- ;
     }
-    s[++p] = a[i], w[p] = width + 1;
+    s[ ++ p] = a[i], w[p] = width + 1;
   }
 }

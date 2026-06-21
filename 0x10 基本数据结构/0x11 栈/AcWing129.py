@@ -1,13 +1,13 @@
 N = 26
 n, num, top, t = 0, 0, 0, 0
-st, ans = [0]*N, [0]*N
+st, ans = [0] * N, [0] * N
 
 def z(x):
     global n, num, top, t
-    if x == n+1:
+    if x == n + 1:
         num += 1
         if num > 20: exit(0)
-        for i in range(1, t+1): print(ans[i], end='')
+        for i in range(1, t + 1): print(ans[i], end='')
         for i in range(top, 0, -1): print(st[i], end='')
         print()
         return

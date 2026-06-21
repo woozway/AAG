@@ -6,7 +6,7 @@ def main():
     for _ in range(n):
         a = int(input())
         heappush(q, (a, 0))
-    while (n-1) % (k-1):
+    while (n - 1) % (k - 1):
         n += 1
         heappush(q, (0, 0))
     
@@ -18,7 +18,7 @@ def main():
             num += v[0]
             w = max(w, v[1])
         ans += num
-        heappush(q, (num, w+1))
+        heappush(q, (num, w + 1))
     print(ans)
     print(q[0][1])
     

@@ -1,6 +1,6 @@
 N = 100006
 n, tot, P = 0, 0, 99991
-a, snow, head, nxt = [0]*6, [0]*N, [0]*N, [0]*N
+a, snow, head, nxt = [0] * 6, [0] * N, [0] * N, [0] * N
 def H(a):
     global n, tot, P
     sum_, mul_ = 0, 1
@@ -15,13 +15,13 @@ def equal(a, b):
         for j in range(6):
             eq = 1
             for k in range(6):
-                if a[(i+k)%6] != b[(j+k)%6]:
+                if a[(i + k) % 6] != b[(j + k) % 6]:
                     eq = 0
                     break
             if eq: return 1
             eq = 1
             for k in range(6):
-                if a[(i+k)%6] != b[(j-k+6)%6]:
+                if a[(i + k) % 6] != b[(j - k + 6) % 6]:
                     eq = 0
                     break
             if eq: return 1
@@ -43,7 +43,7 @@ def insert(a):
 def main():
     global n, tot, P
     n = int(input())
-    for i in range(1, n+1):
+    for i in range(1, n + 1):
         a[:6] = [int(x) for x in input().split()]
         if insert(a):
             print("Twin snowflakes found.")

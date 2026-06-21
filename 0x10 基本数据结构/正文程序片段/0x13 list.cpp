@@ -48,7 +48,7 @@ int initialize() {
 }
 
 int insert(int p, int value) {
-  q = ++tot;
+  q = ++ tot;
   node[q].value = value;
   node[node[p].next].prev = q;
   node[q].next = node[p].next;
@@ -68,7 +68,7 @@ void clear() {
 // 邻接表：加入有向边(x, y)，权值为z
 void add(int x, int y, int z) {
   // vertex[i]表示第i条边的终点是y；edge[i]表示第i条边的权重是z
-  ver[++tot] = y, edge[tot] = z;
+  ver[ ++ tot] = y, edge[tot] = z;
   // head[i]表示节点i所链接的第一条边的终节点在ver中的下标位置
   // next[i]表示第i条边所连的终点节点在ver中的下标
   next[tot] = head[x], head[x] = tot; // 在表头x处插入

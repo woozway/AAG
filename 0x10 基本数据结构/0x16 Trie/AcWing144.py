@@ -1,6 +1,6 @@
 N = 100006
-n, d, trie, tot = 0, [0]*N, [[0]*2 for _ in range(N*33)], 0
-head, ver, edge, nxt, v = [0]*N, [0]*(N*2), [0]*(N*2), [0]*(N*2), [0]*N
+n, d, trie, tot = 0, [0] * N, [[0] * 2 for _ in range(N*33)], 0
+head, ver, edge, nxt, v = [0] * N, [0] * (N * 2), [0] * (N * 2), [0] * (N * 2), [0] * N
 
 def dfs(x):
     global n, tot
