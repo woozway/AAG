@@ -8,21 +8,21 @@ for _ in range(n):
 for i in range(5001):
     for j in range(5001):
         if not i and not j: continue
-        elif not i: s[i][j] += s[i][j-1]
-        elif not j: s[i][j] += s[i-1][j]
-        else: s[i][j] += s[i-1][j] + s[i][j-1] - s[i-1][j-1]
+        elif not i: s[i][j] += s[i][j - 1]
+        elif not j: s[i][j] += s[i - 1][j]
+        else: s[i][j] += s[i - 1][j] + s[i][j - 1] - s[i - 1][j - 1]
 
 def main():
     if r > 5000:
         print(s[5000][5000])
         return
     ans = 0
-    for i in range(r-1, 5001):
-        for j in range(r-1, 5001):
-            if i == r-1 and j == r-1: ans = max(ans, s[i][j])
-            elif i == r-1: ans = max(ans, s[i][j] - s[i][j-r])
-            elif j == r-1: ans = max(ans, s[i][j] - s[i-r][j])
-            else: ans = max(ans, s[i][j] - s[i-r][j] - s[i][j-r] + s[i-r][j-r])
+    for i in range(r - 1, 5001):
+        for j in range(r - 1, 5001):
+            if i == r - 1 and j == r - 1: ans = max(ans, s[i][j])
+            elif i == r - 1: ans = max(ans, s[i][j] - s[i][j - r])
+            elif j == r - 1: ans = max(ans, s[i][j] - s[i - r][j])
+            else: ans = max(ans, s[i][j] - s[i - r][j] - s[i][j - r] + s[i - r][j - r])
     print(ans)
     
 main()

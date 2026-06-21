@@ -6,7 +6,7 @@ PSI p[N];
 int n, m;
 
 int calc(int bit, int now) {
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i ++ ) {
     auto [op, x] = p[i];
     int b = x >> bit & 1;
     if (op == "AND") now &= b;

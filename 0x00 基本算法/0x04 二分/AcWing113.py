@@ -11,14 +11,14 @@ class Solution(object):
         :rtype: List[int]
         """
         a = []
-        for i in range(N): a.append(i+1)
+        for i in range(N): a.append(i + 1)
         for i in range(N):
             k = a[i]
-            l, r = 0, k-1
+            l, r = 0, k - 1
             while l < r:
                 mid = (l + r) >> 1
                 if compare(k, a[mid]): r = mid
                 else: l = mid + 1
-            for j in range(i-1, l-1, -1): a[j+1] = a[j]
+            for j in range(i - 1, l - 1, -1): a[j + 1] = a[j]
             a[l] = k
         return a
