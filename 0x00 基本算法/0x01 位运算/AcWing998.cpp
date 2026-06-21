@@ -1,27 +1,31 @@
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
+typedef pair<string, int> PSI;
+const int N = 1e5 + 10;
+PSI p[N];
+int n, m;
+
+int calc(int bit, int now) {
+  for (int i = 0; i < n; i++) {
+    auto [op, x] = p[i];
+    int b = x >> bit & 1;
+    if (op == "AND") now &= b;
+    else if (op == "OR") now |= b;
+    else now ^= b;
+  }
+  return now;
+}
 
 int main() {
-  cin.tie(0)->sync_with_stdio(0);
-  int n, m;
   cin >> n >> m;
+  for (int i = 0; i < n; i ++ ) cin >> p[i].first >> p[i].second;
 
-  int _0 = 0, _1 = -1; // 每位上全0和全1
-  while (n -- ) {
-    int x;
-    string op;
-    cin >> op >> x;
-
-    if (op[0] == 'A') _0 &= x, _1 &= x;
-    if (op[0] == 'X') _0 ^= x, _1 ^= x;
-    if (op[0] == 'O') _0 |= x, _1 |= x;
+  int t = 0, res = 0; // 每位独立，贪心让伤害最大（每位上都倾向于选0，这样初始值才更有可能在m范围内）
+  for (int i = 30; i >= 0; i -- ) { // 本题中m最大是10^9，lg2(10^9) = 3log2(10^3) < 30
+    int a = calc(i, 0), b = calc(i, 1);
+    if (t + (1 << i) <= m && a < b) t += 1 << i, res += b << i;
+    else res += a << i;
   }
-
-  int res = 0; // 每位独立，可以贪心，让伤害最大
-  for (int i = 29; ~i; i -- ) // 本题中m最大是10^9，lg2(10^9) = 3log2(10^3) < 30
-    if (_0>>i & 1) res += 1 << i; // 说明初始数的该位上填0，经过n道门后是1
-    else if (_1>>i & 1 && (1 << i) <= m) res += 1 << i, m -= 1 << i;
-
   cout << res << endl;
   return 0;
 }

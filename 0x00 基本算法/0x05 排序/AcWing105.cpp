@@ -1,43 +1,38 @@
-#include <iostream>
-#include <cstring>
-#include <algorithm>
-#define ll long long
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 100006;
-int n, m, t, x[N], y[N], a[N], s[N];
+typedef long long LL;
+const int N = 1e5 + 10;
+int n, m, t, row[N], col[N];
+LL s[N], c[N];
 
-int main() {
+// 见 AcWing 122. 糖果传递
+LL calc(int n, int a[]) {
+  for (int i = 1; i <= n; i ++ ) s[i] = s[i - 1] + a[i];
+  if (s[n] % n != 0) return -1; // 判断是否能够均分
+
+  LL b = s[n] / n;
+  int k = 0;
+  for (int i = 1; i < n; i ++ ) c[k ++ ] = i * b - s[i];
+  c[k ++ ] = 0;
+
+  nth_element(c, c + k / 2, c + k); // sort(c, c + k);
+  LL res = 0;
+  for (int i = 0; i < n; i ++ ) res += abs(c[i] - c[k / 2]);
+  return res;
+}
+
+int main () {
   cin >> n >> m >> t;
-  for (int i=1; i<=t; i++) cin >> x[i] >> y[i];
-  bool row = !(t % n), column = !(t % m);
-  if (!row && !column) {
-    cout << "impossible";
-    return 0;
+  while (t -- ) {
+    int x, y;
+    cin >> x >> y;
+    row[x] ++ , col[y] ++ ;
   }
-  else if (row && column) cout << "both ";
-  else if (row) cout << "row ";
-  else cout << "column ";
-  ll ans = 0;
-  if (row) {
-    int num = t / n;
-    memset(a, 0, sizeof(a));
-    for (int i=1; i<=t; i++) a[x[i]]++; // 对i行感兴趣的摊点数++
-    for (int i=1; i<=n; i++) a[i] -= num;
-    s[0] = 0;
-    for (int i=1; i<=n; i++) s[i] = s[i-1] + a[i];
-    sort(s+1, s+n+1); // 计算货舱选址问题需先排序，s[k]取中位数时最优
-    for (int i=1; i<=n/2; i++) ans += s[n-i+1] - s[i];
-  }
-  if (column) {
-    int num = t / m;
-    memset(a, 0, sizeof(a));
-    for (int i=1; i<=t; i++) a[y[i]]++;
-    for (int i=1; i<=m; i++) a[i] -= num;
-    s[0] = 0;
-    for (int i=1; i<=m; i++) s[i] = s[i-1] + a[i];
-    sort(s+1, s+m+1);
-    for (int i=1; i<=m/2; i++) ans += s[m-i+1] - s[i];
-  }
-  cout << ans;
+
+  LL res1 = calc(n, row), res2 = calc(m, col); // 行和列完全正交，互不干扰，分别计算
+  if (res1 != -1 && res2 != -1) cout << "both " << res1 + res2 << endl;
+  else if (res1 != -1) cout << "row " << res1 << endl;
+  else if (res2 != -1) cout << "column " << res2 << endl;
+  else puts("impossible");
   return 0;
 }

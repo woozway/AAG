@@ -1,65 +1,65 @@
-#include <iostream>
-#include <cstring>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 1006;
-// k,ans,ans0中保存大数，lk,la,la0分别为其指针
-int n, k[N*4], lk = 1, ans[N*4], la = 1, ans0[N*4], la0 = 1;
-struct P {
-  int a, b;
-  bool operator < (const P x) const {
-    return a*b < x.a*x.b;
+typedef pair<int, int> PII;
+const int N = 1010;
+int n;
+PII p[N];
+
+vector<int> mul(vector<int>a, int b) {
+  vector<int> c;
+  int t = 0;
+  for (int i = 0; i < a.size(); i ++ ) {
+    t += a[i] * b;
+    c.push_back(t % 10);
+    t /= 10;
   }
-} p[N];
-// k中保存i个大臣前面所有a所相乘的大数
-void gj1(int x) {
-  for (int i=1; i<=lk; i++) k[i] *= x;
-  lk += 4;
-  for (int i=1; i<=lk; i++) {
-    k[i+1] += k[i]/10;
-    k[i] %= 10;
+  while (t) {
+    c.push_back(t % 10);
+    t /= 10;
   }
-  while (!k[lk]) lk--;
+  return c;
 }
-// ans0中保存k中大数/x的值
-void gj2(int x) {
-  int w = 0;
-  bool flag = true; // 因为la0最多只更新一次
-  for (int i=lk; i; i--) {
-    w = w*10 + k[i];
-    ans0[i] = w/x;
-    w %= x;
-    if (ans0[i] && flag) {
-      la0 = i;
-      flag = false;
+
+vector<int> div(vector<int>a, int b) {
+  vector<int> c;
+  bool is_first = true;
+  for (int i = a.size() - 1, t = 0; i >= 0; i -- ) {
+    t = t * 10 + a[i];
+    int x = t / b;
+    if (!is_first || x) {
+      is_first = false;
+      c.push_back(x);
     }
+    t %= b;
   }
+  reverse(c.begin(), c.end());
+  return c;
 }
-// 判断ans中所存的大数是否小于临时变量大数ans0，若是则更新
-bool pd() {
-  if (la != la0) return la < la0;
-  for (int i=la; i; i--)
-    if (ans[i] != ans0[i]) return ans[i] < ans0[i];
-  return 0;
+
+vector<int> max_vec(vector<int> a, vector<int> b) {
+  if (a.size() > b.size()) return a;
+  if (a.size() < b.size()) return b;
+  if (vector<int>(a.rbegin(), a.rend()) > vector<int>(b.rbegin(), b.rend())) return a;
+  return b;
 }
 
 int main() {
   cin >> n;
-  for (int i=0; i<=n; i++) cin >> p[i].a >> p[i].b;
-  sort(p+1, p+n+1); // 逆序对=0即可结束本题，后续为大数处理环节
-  memset(k, 0, sizeof(k));
-  memset(ans, 0, sizeof(ans));
-  memset(ans0, 0, sizeof(ans0));
-  k[1] = 1;
-  gj1(p[0].a);
-  for (int i=1; i<=n; i++) {
-    gj2(p[i].b);
-    if (pd()) {
-      memcpy(ans, ans0, sizeof(ans));
-      la = la0;
-    }
-    gj1(p[i].a);
+  for (int i = 0; i <= n; i ++ ) {
+    int a, b;
+    cin >> a >> b;
+    p[i] = {a * b, a};
   }
-  for (int i=la; i; i--) cout << ans[i];
+  sort(p + 1, p + n + 1);
+
+  vector<int> product(1, 1);
+  vector<int> res(1, 0);
+  for (int i = 0; i <= n; i ++ ) {
+    if (i) res = max_vec(res, div(product, p[i].first / p[i].second));
+    product = mul(product, p[i].second);
+  }
+
+  for (int i = res.size() - 1; i >= 0; i -- ) cout << res[i];
+  cout << endl;
   return 0;
 }

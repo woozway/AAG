@@ -1,12 +1,12 @@
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-typedef unsigned long long ULL;
+typedef long long LL;
 
 int main() {
-  ULL a, b, p;
+  LL a, b, p;
   cin >> a >> b >> p;
 
-  ULL res = 0;
+  LL res = 0;
   while (b) {
     if (b & 1) res = (res + a) % p;
     a = (a + a) % p;

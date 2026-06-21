@@ -1,5 +1,4 @@
-#include <vector>
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
 int n;
 vector<int> path;
@@ -8,7 +7,7 @@ void dfs(int u, int state) {
   if (u == n) {
     for (auto x : path) cout << x << ' ';
     cout << endl;
-    return;
+    return ;
   }
 
   for (int i = 0; i < n; i ++ )

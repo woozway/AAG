@@ -1,20 +1,19 @@
-#include <iostream>
-#include <cmath>
+#include <bits/stdc++.h>
 using namespace std;
 typedef long long LL;
 typedef pair<LL, LL> PLL;
 
 // 顺时针旋转 theta = 90 deg（向量右乘旋转矩阵）再水平翻转（theta = 270 同理）
-// Rotation matrix: [ cosθ, -sinθ ]
-//                  [ sinθ,  cosθ ]
+// Rotation matrix: | cosθ, -sinθ |
+//                  | sinθ,  cosθ |
 
 // calc(N, M) 返回编号为 M 的房屋（从0开始）在 N 级城市中的位置
 // len 表示组成 N 级城市的所有 N-1 级正方形边长（一个格子记为 1，尚未乘 10）
-// cnt 表示组成 N 级城市的所有 N-1 级城市的个数：2^2(n-1)
+// cnt 表示组成 N 级城市的所有 N-1 级城市的个数：4^(n-1)
 PLL calc(LL n, LL m) {
   if (!n) return {0, 0};
   // 这里因为 N<=31，2*N-2 会超出 int 表示范围，所以加 ll
-  LL len = 1 << n - 1, cnt = 1ll << 2 * (n - 1);
+  LL len = 1ll << n - 1, cnt = 1ll << 2 * (n - 1);
   auto pos = calc(n - 1, m % cnt);
   auto x = pos.first, y = pos.second;
   auto z = m / cnt;

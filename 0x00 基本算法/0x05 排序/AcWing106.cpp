@@ -1,43 +1,42 @@
-#include <iostream>
-#include <queue>
+#include <bits/stdc++.h>
 using namespace std;
-// q1大根堆（保存大小上前一半的数）q2小根堆保存后一半
-priority_queue<int> q1, q2;
-
-void Running_Median() {
-  while (q1.size()) q1.pop();
-  while (q2.size()) q2.pop();
-  int num, n, a, cnt = 1;
-  cin >> num >> n;
-  cout << num << " " << (n+1)/2 << endl;
-  cin >> a;
-  cout << a;
-  q2.push(-a); // 当q1和q2中的个数不等时，q2中总是多一个
-  for (int i=2; i<=n; i++) {
-    cin >> a;
-    if (a < -q2.top()) q1.push(a);
-    else q2.push(-a);
-    int s = q1.size();
-    if (s > i/2) {
-      q2.push(-q1.top());
-      q1.pop();
-    }
-    if (s < i/2) {
-      q1.push(-q2.top());
-      q2.pop();
-    }
-    if (i % 2) {
-      if (cnt % 10) cout << " ";
-      cout << -q2.top();
-      if (++cnt % 10 == 0) cout << endl;
-    }
-  }
-  if (cnt % 10) cout << endl;
-}
+typedef pair<int,int> PII;
+const int N = 10010;
 
 int main() {
-  int t;
-  cin >> t;
-  while (t--) Running_Median();
+  int T;
+  cin >> T;
+  while (T -- ) {
+    int m, n;
+    cin >> m >> n;
+    priority_queue<int> max_heap; // max_heap 存储较小的一半数字
+    priority_queue<int, vector<int>, greater<int>> min_heap;
+
+    printf("%d %d\n", m, (n + 1) / 2);
+    int cnt = 0;
+    for (int i = 0; i < n; i ++ ) {
+      int t;
+      scanf("%d", &t);
+      max_heap.push(t); // 默认先把新数扔进大根堆，动态中位数放在 max_heap 里
+      if (min_heap.size() && min_heap.top() < max_heap.top()) {
+        auto a = min_heap.top(), b = max_heap.top();
+        min_heap.pop(), max_heap.pop();
+        min_heap.push(b), max_heap.push(a);
+      }
+
+      if (max_heap.size() > min_heap.size() + 1) {
+        min_heap.push(max_heap.top());
+        max_heap.pop();
+      }
+
+      if (!(i & 1)) {
+        printf("%d ", max_heap.top());
+        if ( ++ cnt % 10 == 0) puts("");
+      }
+    }
+
+    if (cnt % 10) puts(""); // 最后一行如果不满10个，也要补一个换行符
+  }
+
   return 0;
 }

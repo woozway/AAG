@@ -1,20 +1,32 @@
-#include <iostream>
-#define ll long long
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 100006;
-int a[N], b[N]; // b是a上的差分数列，问题转化为把b2,..,bn变全0
+typedef long long LL;
+const int N = 1e5 + 10;
+int n, a[N];
 
+// b[l] += C, b[r + 1] -= C
+// 1. 2 <= i, j <= n
+// 2. i = 1, 2 <= j <= n
+// 3. 2 <= i <= n, j = n + 1
+// 4. i = 1, j = n + 1 无意义
+
+// 先求差分数组 b：目标是把 b[2] ... b[n] 都变成 0；
+// 然后统计 b 中正/负数的和，让他们最大程度地互相抵消
+// 尽可能多选 1.，其他由 2. 和 3. 来补：
+//   最少操作次数：min(pos, neg) + |pos - neg| = max(pos, neg)
+//   最终数列个数：1. 可选：0 ~ |pos - neg|种方案
 int main() {
-  int n;
   cin >> n;
-  for (int i=1; i<=n; i++) cin >> a[i];
-  b[n+1] = 0, b[1] = a[1];
-  for (int i=2; i<=n; i++) b[i] = a[i] - a[i-1];
-  // 这里因为b[i]可能是0x7fffffff，两个数相加会溢出，所以用ll
-  ll p = 0, q = 0;
-  for (int i=2; i<=n; i++)
-    if (b[i] > 0) p += b[i];
-    else if (b[i] < 0) q -= b[i];
-  cout << max(p, q) << endl << abs(p - q) + 1;
+  for (int i = 1; i <= n; i ++ ) cin >> a[i];
+  for (int i = n; i > 1; i -- ) a[i] -= a[i - 1];
+
+  LL pos = 0, neg = 0;
+  for (int i = 2; i <= n; i ++ )
+    if (a[i] > 0) pos += a[i];
+    else neg -= a[i];
+
+  cout << min(pos, neg) + abs(pos - neg) << endl;
+  cout << abs(pos - neg) + 1 << endl;
+
   return 0;
 }

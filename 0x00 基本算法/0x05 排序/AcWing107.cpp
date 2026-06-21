@@ -1,30 +1,29 @@
-#include <iostream>
-#define ll long long
+#include <bits/stdc++.h>
+typedef long long LL;
 using namespace std;
-const int N = 500006;
-int n, a[N], b[N];
-ll ans;
+const int N = 5e5 + 10;
+int n, a[N], tmp[N];
 
-void merge(int l, int mid, int r) {
-  if (l == r) return;
-  merge(l, (l+mid)>>1, mid);
-  merge(mid+1, (mid+1+r)>>1, r);
-  int i = l, j = mid+1;
-  // 归并排序左右合并时进行逆序对统计
-  for (int k=l; k<=r; k++)
-    if (j > r || (i <= mid && a[i] <= a[j])) b[k] = a[i++];
-    else b[k] = a[j++], ans += mid - i + 1;
-  for (int k=l; k<=r; k++) a[k] = b[k];
-}
+LL merge_sort(int l, int r) {
+  if (l >= r) return 0;
 
-void Ultra_QuickSort() {
-  for (int i=1; i<=n; i++) cin >> a[i];
-  ans = 0;
-  merge(1, (1+n)>>1, n);
-  cout << ans << endl;
+  int mid = l + r >> 1;
+  LL res = merge_sort(l, mid) + merge_sort(mid + 1, r);
+
+  int i = l, j = mid + 1;
+  for (int k = l; k <= r; k ++ )
+    if (j > r || i <= mid && a[i] <= a[j]) tmp[k] = a[i ++ ];
+    else tmp[k] = a[j ++ ], res += mid - i + 1;
+
+  for (int k = l; k <= r; k ++ ) a[k] = tmp[k];
+
+  return res;
 }
 
 int main() {
-  while (cin >> n && n) Ultra_QuickSort();
+  while (cin >> n && n) {
+    for (int i = 1; i <= n; i ++ ) cin >> a[i];
+    cout << merge_sort(1, n) << endl;
+  }
   return 0;
 }

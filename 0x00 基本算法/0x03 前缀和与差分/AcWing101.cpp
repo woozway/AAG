@@ -1,29 +1,27 @@
-#include <iostream>
-#include <map>
+#include <bits/stdc++.h> // 用 unordered_set 需要自己写哈希
 using namespace std;
-map<pair<int, int>, bool> existed;
-const int N = 10006;
-// c[i]表示和最高的牛p的高度h相比，要矮多少
-// 为了降低算法时间复杂度从O(nm)到O(m+n)，使用差分数列更新a,b之间牛的身高
-// d是c的差分数列，之后对d进行求前缀和，以得到c数列
-int c[N], d[N];
+typedef pair<int, int> PII;
+const int N = 1e4 + 10;
+int d[N], n, p, h, m;
 
+// 每一对关系 AB 和其他关系 CD 没有交集（套娃，但边界点可能重合）
 int main() {
-  int n, p, h, m;
   cin >> n >> p >> h >> m;
-  while (m--) {
-    int a, b;
+  d[1] = h; // 差分序列 d[1] = h 可以把所有牛的初始身高都变成 h
+
+  set<PII> existed;
+  for (int i = 0, a, b; i < m; i ++ ) {
     cin >> a >> b;
     if (a > b) swap(a, b);
-    // 一条关系可能输入多次，只算一次
-    if (existed[make_pair(a, b)]) continue;
-    // 差分数列d上操作两个端点：表示[a+1,b-1]之间坐标的牛的高度都-1
-    d[a+1]--, d[b]++;
-    existed[make_pair(a, b)] = true;
+    if (!existed.count({a, b})) {
+      existed.insert({a, b});
+      d[a + 1] -- , d[b] ++ ; // 将 [a + 1, b - 1] 的每个数减 1
+    }
   }
-  for (int i=1; i<=n; i++) {
-    c[i] = c[i-1] + d[i];
-    cout << h + c[i] << endl;
+
+  for (int i = 1; i <= n; i ++ ) { // 恢复原数组，d 上前缀和
+    d[i] += d[i - 1];
+    cout << d[i] << endl;
   }
   return 0;
 }

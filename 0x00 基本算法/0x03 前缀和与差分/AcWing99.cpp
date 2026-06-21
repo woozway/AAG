@@ -1,42 +1,33 @@
-#include <iostream>
-#include <cstring>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 5006;
-// 这里求前缀和时把一个点(x,y)看成一个格子，可认为目标位于格子中心
-int n, r, s[N][N];
+const int N = 5010;
+int n, m;
+int s[N][N];
 
 int main() {
-  memset(s, 0, sizeof(s));
-  cin >> n >> r;
-  while (n--) {
+  int cnt, R;
+  cin >> cnt >> R;
+  R = min(5001, R); // 前缀和从1开始，横纵坐标 +1 后最大格子坐标 5001
+
+  while (cnt -- ) {
     int x, y, w;
     cin >> x >> y >> w;
+    x ++ , y ++ ; // 前缀和习惯从 1 开始，不用处理边界
     s[x][y] += w;
   }
-  // s[i][j] = s[i-1][j] + s[i][j-1] - s[i-1][j-1] + a[i][j]
-  // 内存限制严格，省略a数组，读入时直接向s中累加
-  for (int i=0; i<=5000; i++)
-    for (int j=0; j<=5000; j++)
-      if (!i && !j) continue;
-      else if (!i) s[i][j] += s[i][j-1];
-      else if (!j) s[i][j] += s[i-1][j];
-      else s[i][j] += s[i-1][j] + s[i][j-1] - s[i-1][j-1];
-  // 特判，如果炸弹范围很大，所有目标都会被摧毁
-  if (r > 5000) {
-    cout << s[5000][5000];
-    return 0;
-  }
-  // s[i][j] = s[i-r][j] + s[i][j-r] - s[i-r][j-r] + sum(a[x][y])
-  // 这里求的是sum(a[x][y)]，x从i-r+1到i，y从j-r+1到j，长度都是r
-  // 这里i和j都从r-1开始，因为(r-1)-0+1=r；当i==r-1 && j==r-1时，
-  // 求的是最左上角边长为r的正方形爆炸区域摧毁的总价值
-  int ans = 0;
-  for (int i=r-1; i<=5000; i++)
-    for (int j=r-1; j<=5000; j++)
-      if (i == r-1 && j == r-1) ans = max(ans, s[i][j]);
-      else if (i == r-1) ans = max(ans, s[i][j] - s[i][j-r]);
-      else if (j == r-1) ans = max(ans, s[i][j] - s[i-r][j]);
-      else ans = max(ans, s[i][j] - s[i-r][j] - s[i][j-r] + s[i-r][j-r]);
-  cout << ans;
+
+  // 预处理二维前缀和：s[i][j] 表示 (1,1) 到 (i,j) 的矩形价值总和
+  n = m = 5001;
+  for (int i = 1; i <= n; i ++ )
+    for (int j = 1; j <= m; j ++ )
+      s[i][j] += s[i - 1][j] + s[i][j - 1] - s[i - 1][j - 1];
+
+  // 枚举边长为 R 的正方形的右下角坐标 (i, j)
+  int res = 0;
+  for (int i = R; i <= n; i ++ )
+    for (int j = R; j <= m; j ++ )
+      res = max(res, s[i][j] - s[i - R][j] - s[i][j - R] + s[i - R][j - R]);
+
+  cout << res << endl;
   return 0;
 }

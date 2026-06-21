@@ -1,7 +1,7 @@
 def power(a, b, p):
     ans = 1 % p
     while b:
-        if b&1: ans = ans * a % p
+        if b & 1: ans = ans * a % p
         a = a * a % p
         b >>= 1
     return ans

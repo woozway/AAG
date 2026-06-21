@@ -1,38 +1,34 @@
-#include <iostream>
-#include <queue>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 50006;
-struct COW {
-  int id, l, r, ans;
-  bool operator < (const COW x) const {
-    return l < x.l;
-  }
-} cow[N];
-priority_queue<pair<int, int> > s; // 默认为大根堆
+typedef pair<int, int> PII;
+const int N = 5e4 + 10;
+int n, id[N]; // id：记录每头牛（按原始输入顺序）最终分配到的畜栏编号
+pair<PII, int> cows[N]; // cows：pair<pair<开始时间, 结束时间>, 输入的原始序号>
 
 int main() {
-  int n, ans[N];
   cin >> n;
-  for (int i=1; i<=n; i++) {
-    cow[i].id = i;
-    cin >> cow[i].l >> cow[i].r;
+  for (int i = 0; i < n; i ++ ) {
+    cin >> cows[i].first.first >> cows[i].first.second;
+    cows[i].second = i;
   }
-  sort(cow+1, cow+n+1);
-  // 扫描s，找到一畜栏：满足当前牛开始吃草时间>=畜栏中最后一头牛结束吃草的时间
-  for (int i=1; i<=n; i++) {
-    int num = s.size();
-    if (num && -s.top().first < cow[i].l) {
-      cow[i].ans = s.top().second;
-      s.pop();
-      s.push(make_pair(-cow[i].r, cow[i].ans));
-      continue;
+
+  sort(cows, cows + n); // 按牛的开始吃草时间从早到晚排序
+
+  priority_queue<PII, vector<PII>, greater<PII>> heap; // minheap，<畜栏的结束时间，畜栏编号>
+  for (int i = 0; i < n; i ++ )
+    if (heap.empty() || heap.top().first >= cows[i].first.first) {
+      PII stall = {cows[i].first.second, heap.size()}; // 需要新开一个畜栏
+      id[cows[i].second] = stall.second; // 利用牛的“身份证”找回它原本的位置，为它分配畜栏编号
+      heap.push(stall);
     }
-    cow[i].ans = ++num;
-    s.push(make_pair(-cow[i].r, num));
-  }
-  cout << s.size() << endl;
-  for (int i=1; i<=n; i++) ans[cow[i].id] = cow[i].ans;
-  for (int i=1; i<=n; i++) cout << ans[i] << endl;
+    else { // 贪心：复用现有畜栏，直接把这头牛塞进最早空出来的畜栏里
+      auto stall = heap.top(); heap.pop();
+      stall.first = cows[i].first.second; // 用新加入的cow[i]的结束时间更新该畜栏的结束时间
+      id[cows[i].second] = stall.second;
+      heap.push(stall);
+    }
+
+  cout << heap.size() << endl;
+  for (int i = 0; i < n; i ++ ) cout << id[i] + 1 << endl; // 畜栏编号从 1 开始
   return 0;
 }
