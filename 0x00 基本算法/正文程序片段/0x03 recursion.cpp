@@ -54,16 +54,16 @@ void calc(int k) {
 vector<int> chosen;
 int stack[100010], top = 0, address = 0;
 
-void call(int x, int ret_addr) { // 模拟计算机汇编指令call
+void call(int x, int ret_addr) { // 模拟计算机汇编指令 call
   int old_top = top;
-  stack[ ++ top] = x; // 参数x
+  stack[ ++ top] = x; // 参数 x
   stack[ ++ top] = ret_addr; // 返回地址标号
-  stack[ ++ top] = old_top; // 在栈顶记录以前的top值
+  stack[ ++ top] = old_top; // 在栈顶记录以前的 top 值
 }
 
-int ret() { // 模拟计算机汇编指令ret
+int ret() { // 模拟计算机汇编指令 ret
   int ret_addr = stack[top - 1];
-  top = stack[top]; // 恢复以前的top值
+  top = stack[top]; // 恢复以前的 top 值
   return ret_addr;
 }
 
@@ -86,17 +86,17 @@ int main() {
         address = ret(); // return
         continue;
       }
-      call(x + 1, 1); // 相当于calc(x + 1)，返回后会从case 1继续执行
+      call(x + 1, 1); // 相当于 calc(x + 1)，返回后会从 case 1 继续执行
       address = 0;
-      continue; // 回到while循环开头，相当于开始新的递归
+      continue; // 回到 while 循环开头，相当于开始新的递归
     case 1:
       chosen.push_back(x);
-      call(x + 1, 2); // 相当于calc(x + 1)，返回后会从case 2继续执行
+      call(x + 1, 2); // 相当于 calc(x + 1)，返回后会从 case 2 继续执行
       address = 0;
-      continue; // 回到while循环开头，相当于开始新的递归
+      continue; // 回到 while 循环开头，相当于开始新的递归
     case 2:
       chosen.pop_back();
-      address = ret(); // 相当于原calc函数结尾，执行return
+      address = ret(); // 相当于原 calc 函数结尾，执行 return
     }
   }
 }

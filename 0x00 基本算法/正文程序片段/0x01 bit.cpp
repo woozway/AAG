@@ -1,7 +1,7 @@
 typedef long long LL;
 typedef unsigned long long ULL;
 
-// 快速幂，求a^b mod p
+// 快速幂，求 a^b mod p
 int power(int a, int b, int p) {
   int ans = 1;
   for (; b; b >>= 1) {
@@ -11,7 +11,7 @@ int power(int a, int b, int p) {
   return ans;
 }
 
-// 64位整数乘法的O(log b)算法
+// 64 位整数乘法的 O(log b) 算法
 LL mul(LL a, LL b, LL p) {
   LL ans = 0;
   for (; b; b >>= 1) {
@@ -21,9 +21,9 @@ LL mul(LL a, LL b, LL p) {
   return ans;
 }
 
-// 64位整数乘法的long double算法
+// 64 位整数乘法的 long double 算法
 ULL mul(ULL a, ULL b, ULL p) {
-  a %= p, b %= p;  // 当a,b一定在0~p之间时，此行不必要
+  a %= p, b %= p;  // 当 a, b 一定在 0 ~ p 之间时，此行不必要
   ULL c = (long double)a * b / p;
   ULL x = a * b, y = c * p;
   LL ans = (LL)(x % p) - (LL)(y % p);
@@ -31,7 +31,7 @@ ULL mul(ULL a, ULL b, ULL p) {
   return ans;
 }
 
-// hamilton路径
+// hamilton 路径
 int f[1 << 20][20];
 int hamilton(int n, int weight[20][20]) {
   memset(f, 0x3f, sizeof(f));
@@ -45,7 +45,7 @@ int hamilton(int n, int weight[20][20]) {
   return f[(1 << n) - 1][n - 1];
 }
 
-// lowbit运算，找到二进制下所有是1的位
+// lowbit 运算，找到二进制下所有是 1 的位
 int H[37];
 // 预处理
 for (int i = 0; i < 36; i ++ ) H[(1ll << i) % 37] = i;
