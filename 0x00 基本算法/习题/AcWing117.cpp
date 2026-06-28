@@ -1,34 +1,36 @@
-#include <iostream>
-#include <cstring>
+#include <bits/stdc++.h>
 using namespace std;
-// f[i]存扑克牌中字符i对应的1-13中的数字，ans[i]存i正面目前有几张
-int f[100], ans[13];
-char s[14][5];
+vector<int> closed[14]; // closed 数组用来存放 13 堆尚未翻开（背面朝上）的牌
+int open[14]; // open 数组用来记录每一堆“已经正面朝上”翻开的牌的数量
 
 int main() {
-  for (int i=1; i<=13; i++)
-    for (int j=1; j<=4; j++)
-      cin >> s[i][j];
-  f['A'] = 1;
-  for (int i='2'; i<='9'; i++) f[i] = i - '0';
-  f['0'] = 10;
-  f['J'] = 11;
-  f['Q'] = 12;
-  f['K'] = 13;
-  memset(ans, 0, sizeof(ans));
-  for (int i=1; i<=4; i++) {
-    char t = s[13][i];
-    while (f[t] != 13) {
-      ans[f[t]]++;
-      // 这里默认4位置就是最后一张，所以下步要调整所有还没翻过来的牌往后挪一位
-      char tmp = s[f[t]][4];
-      for (int j=4; j>ans[f[t]]; j--) s[f[t]][j] = s[f[t]][j-1];
-      t = tmp;
+  for (int i = 1; i <= 13; i ++ )
+    for (int j = 0; j < 4; j ++ ) {
+      int x;
+      char s[2];
+      cin >> s;
+      if (*s >= '2' && *s <= '9') x = *s - '0';
+      else if (*s == '0') x = 10;
+      else if (*s == 'A') x = 1;
+      else if (*s == 'J') x = 11;
+      else if (*s == 'Q') x = 12;
+      else x = 13;
+      closed[i].push_back(x);
+    }
+
+  // 游戏从第 13 堆（K 堆）开始作为初始动力池。第 13 堆一共 4 张牌，所以发起 4 轮连锁
+  for (int i = 0; i < 4; i ++ ) {
+    int t = closed[13][i];
+    while (t != 13) {
+      open[t] ++ ; // 把刚抽到的牌 t 放到对应的第 t 堆上，该堆翻开的牌数 +1
+      int r = t;
+      t = closed[r].back(); // 从第 r 堆的顶部（最后存入的牌）抽出一张新的未翻开的牌，赋值给 t
+      closed[r].pop_back();
     }
   }
-  int cnt = 0;
-  for (int i=1; i<=12; i++)
-    if (ans[i] == 4) cnt++;
-  cout << cnt;
+
+  int res = 0;
+  for (int i = 1; i <= 12; i ++ ) res += open[i] >= 4;
+  cout << res << endl;
   return 0;
 }

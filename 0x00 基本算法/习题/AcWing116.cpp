@@ -1,64 +1,46 @@
-#include <iostream>
-#include <cstring>
+#include <bits/stdc++.h>
 using namespace std;
-char s[4][4];
-bool a[4][4], c[4][4];
-int p[37];
+typedef pair<int,int> PII;
+const int N = 4;
+int change[N][N]; // change[i][j]：当点击 (i, j) 位置时，受影响的所有格子的“二进制状态掩码”
 
-int lowbit(int x) {
-  return x & -x;
-}
-
-int num(int x) { // 计算出x中有几个1，这里是计算矩阵变成全1需要花几步
-  int cnt = 0;
-  while (x) {
-    cnt++;
-    x -= lowbit(x);
-  }
-  return cnt;
-}
-
-void dj(int x, int y) { // 对x,y所在的行与列进行取反操作
-  for (int i=0; i<4; i++) {
-    c[x][i] ^= 1;
-    c[i][y] ^= 1;
-  }
-  c[x][y] ^= 1; // x,y位置上取反了两次，要减一次
-}
-
-int pd(int x) { // x的二进制表示哪些位置上的开关需要取反
-  memcpy(c, a, sizeof(c));
-  while (x) {
-    int k = lowbit(x)%37;
-    dj(p[k]/4, p[k]%4); // 这里p[2^k % 37]把2^k映射到k，这里即[0,15]
-    x -= lowbit(x);
-  }
-  for (int i=0; i<4; i++)
-    for (int j=0; j<4; j++)
-      if (!c[i][j]) return 0;
-  return 1;
+int get(int x, int y) {
+  return x * N + y; // 将 4x4 矩阵的二维坐标 (x, y) 映射为 0~15 的一维编号
 }
 
 int main() {
-  for (int i=0; i<4; i++) cin >> s[i];
-  for (int i=0; i<4; i++)
-    for (int j=0; j<4; j++)
-      a[i][j] = (s[i][j] == '-'); // '-'处为1，'+'处为0
-  int ans = 17, x; // x表示最后的计算步骤
-  // k在[0,35]时，(2^k % 37)互不相等，且恰好取遍1-36
-  for (int i=0; i<16; i++) p[(1<<i) % 37] = i; // 将2^i映射到i
-  for (int i=0; i<(1<<16); i++) {
-    int n = num(i);
-    if (n<ans && pd(i)) { // 如果当前的方案步骤书更少且最后矩阵可以全1
-      ans = n;
-      x = i;
+  // 预处理操作掩码：计算点击每个位置 (i, j) 会影响哪些格子
+  for (int i = 0; i < N; i ++ )
+    for (int j = 0; j < N; j ++ ) {
+      for (int k = 0; k < N; k ++ ) change[i][j] += (1 << get(i, k)) + (1 << get(k, j));
+      change[i][j] -= 1 << get(i, j); // 在上面的循环中，交叉点 (i, j) 被加了两次，需要去重
     }
+
+  int state = 0; // 读取初始状态，压缩成一个 16 位的整数 state
+  for (int i = 0; i < N; i ++ ) {
+    string line;
+    cin >> line;
+    for (int j = 0; j < N; j ++ )
+      if (line[j] == '+') // '+' 视为 1 (闭合需要被翻转)，'-' 视为 0 (目标状态)
+        state += 1 << get(i, j);
   }
-  cout << ans << endl;
-  while (x) {
-    int k = lowbit(x) % 37;
-    cout << p[k]/4+1 << " " << p[k]%4+1 << endl;
-    x -= lowbit(x);
+
+  vector<PII> path, temp;
+  for (int i = 0; i < 1 << 16; i ++ ) { // 每一个整数 i 的二进制表示，就代表了一种点击方案
+    int now = state;
+    temp.clear();
+    for (int j = 0; j < 16; j ++ ) // 遍历这 16 个格子，看看当前方案 i 打算按哪些格子
+      if (i >> j & 1) {
+        int x = j / 4, y = j % 4;
+        now ^= change[x][y]; // 用now 异或上预处理好的操作掩码 change[x][y]，完成一行一列的翻转
+        temp.push_back({x, y});
+      }
+    if (!now && (path.empty() || path.size() > temp.size())) path = temp;
   }
+
+  cout << path.size() << endl;
+  for (auto &p : path)
+    cout << p.first + 1 << ' ' << p.second + 1 << endl;
+
   return 0;
 }
