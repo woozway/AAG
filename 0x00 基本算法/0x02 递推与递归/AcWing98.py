@@ -1,24 +1,51 @@
-from math import sqrt
+import sys
+import math
 
-def calc(N, M):
-    if N == 0: return (0, 0)
-    len_, cnt = 1 << (N - 1), 1 << (2 * N - 2)
-    x, y = calc(N - 1, M % cnt)
-    z = M // cnt
-    if z == 0: return (y, x)
-    if z == 1: return (x, y + len_)
-    if z == 2: return (x + len_, y + len_)
-    if z == 3: return (2 * len_ - y - 1, len_ - x - 1)
+def calc(n, m):
+    if n == 0:
+        return (0, 0)
+    
+    len_val = 1 << (n - 1)
+    cnt = 1 << (2 * (n - 1))
+    
+    pos = calc(n - 1, m % cnt)
+    x, y = pos[0], pos[1]
+    z = m // cnt
+    
+    if z == 0:
+        return (y, x)
+    elif z == 1:
+        return (x, y + len_val)
+    elif z == 2:
+        return (x + len_val, y + len_val)
+    else:
+        return (-y + 2 * len_val - 1, -x + len_val - 1)
 
 def main():
-    n = int(input())
-    for _ in range(n):
-        N, A, B = [int(x) for x in input().split()]
-        ax, ay = calc(N, A - 1)
-        bx, by = calc(N, B - 1)
-        dx, dy = ax - bx, ay - by
-        # python3中的四舍五入是银行家算法（舍入时向最近的偶数靠近）
-        # print(round(sqrt(dx*dx + dy*dy) * 10))
-        print(int(0.5 + sqrt(dx * dx + dy * dy) * 10))
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    
+    t = int(input_data[0])
+    idx = 1
+    results = []
+    
+    for _ in range(t):
+        n = int(input_data[idx])
+        a = int(input_data[idx + 1])
+        b = int(input_data[idx + 2])
+        idx += 3
         
-main()
+        ac = calc(n, a - 1)
+        bc = calc(n, b - 1)
+        
+        dx = ac[0] - bc[0]
+        dy = ac[1] - bc[1]
+        
+        dist = math.sqrt(dx * dx + dy * dy) * 10
+        results.append(str(int(round(dist))))
+        
+    print('\n'.join(results))
+
+if __name__ == '__main__':
+    main()

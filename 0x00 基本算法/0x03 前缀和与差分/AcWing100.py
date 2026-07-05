@@ -1,16 +1,28 @@
-N = 100006
-a, b = [0] * N, [0] * N
+import sys
 
 def main():
-    n = int(input())
-    for i in range(1, n + 1): a[i] = int(input())
-    b[n + 1] = 0; b[1] = a[1]
-    for i in range(2, n + 1): b[i] = a[i] - a[i - 1]
-    p, q = 0, 0
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    
+    n = int(input_data[0])
+    a = [0] * (n + 2)
+    for i in range(1, n + 1):
+        a[i] = int(input_data[i])
+        
+    for i in range(n, 1, -1):
+        a[i] -= a[i - 1]
+        
+    pos = 0
+    neg = 0
     for i in range(2, n + 1):
-        if b[i] > 0: p += b[i]
-        elif b[i] < 0: q -= b[i]
-    print(max(p, q))
-    print(abs(p - q) + 1)
+        if a[i] > 0:
+            pos += a[i]
+        else:
+            neg -= a[i]
+            
+    print(min(pos, neg) + abs(pos - neg))
+    print(abs(pos - neg) + 1)
 
-main()
+if __name__ == '__main__':
+    main()

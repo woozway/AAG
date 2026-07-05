@@ -1,28 +1,41 @@
-N = 5006
-s = [[0]*N for _ in range(N)]
-n, r = [int(x) for x in input().split()]
-for _ in range(n):
-    x, y, w = [int(x) for x in input().split()]
-    s[x][y] += w
-
-for i in range(5001):
-    for j in range(5001):
-        if not i and not j: continue
-        elif not i: s[i][j] += s[i][j - 1]
-        elif not j: s[i][j] += s[i - 1][j]
-        else: s[i][j] += s[i - 1][j] + s[i][j - 1] - s[i - 1][j - 1]
+import sys
 
 def main():
-    if r > 5000:
-        print(s[5000][5000])
+    input_data = sys.stdin.read().split()
+    if not input_data:
         return
-    ans = 0
-    for i in range(r - 1, 5001):
-        for j in range(r - 1, 5001):
-            if i == r - 1 and j == r - 1: ans = max(ans, s[i][j])
-            elif i == r - 1: ans = max(ans, s[i][j] - s[i][j - r])
-            elif j == r - 1: ans = max(ans, s[i][j] - s[i - r][j])
-            else: ans = max(ans, s[i][j] - s[i - r][j] - s[i][j - r] + s[i - r][j - r])
-    print(ans)
     
-main()
+    cnt = int(input_data[0])
+    r = int(input_data[1])
+    
+    limit = 5001
+    r = min(limit, r)
+    
+    s = [[0] * (limit + 1) for _ in range(limit + 1)]
+    
+    idx = 2
+    for _ in range(cnt):
+        x = int(input_data[idx])
+        y = int(input_data[idx + 1])
+        w = int(input_data[idx + 2])
+        idx += 3
+        x += 1
+        y += 1
+        if x <= limit and y <= limit:
+            s[x][y] += w
+            
+    for i in range(1, limit + 1):
+        for j in range(1, limit + 1):
+            s[i][j] += s[i - 1][j] + s[i][j - 1] - s[i - 1][j - 1]
+            
+    res = 0
+    for i in range(r, limit + 1):
+        for j in range(r, limit + 1):
+            val = s[i][j] - s[i - r][j] - s[i][j - r] + s[i - r][j - r]
+            if val > res:
+                res = val
+                
+    print(res)
+
+if __name__ == '__main__':
+    main()

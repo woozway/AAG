@@ -1,15 +1,22 @@
-def mul(a, b, p):
-    ans = 0
-    while b:
-        if b & 1: ans = (ans + a) % p
-        a = a * 2 % p
-        b >>= 1
-    return ans
-    
+import sys
+
 def main():
-    a = int(input())
-    b = int(input())
-    p = int(input())
-    print(mul(a, b, p))
+    input_data = sys.stdin.read().split()
+    if len(input_data) < 3:
+        return
     
-main()
+    a = int(input_data[0])
+    b = int(input_data[1])
+    p = int(input_data[2])
+    
+    res = 0
+    while b:
+        if b & 1:
+            res = (res + a) % p
+        a = (a + a) % p
+        b >>= 1
+        
+    print(res)
+
+if __name__ == '__main__':
+    main()

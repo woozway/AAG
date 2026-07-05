@@ -1,33 +1,48 @@
-from bisect import bisect_left
-N = 200006
-a, x, y, cinema, ans = [0] * N, [0] * N, [0] * N, [0] * N * 3, [0] * N * 3
-tot, k = 0, 0
-
-def find(f):
-    global cinema, k
-    return bisect_left(cinema, f, 1, k + 1)
+import sys
+import bisect
 
 def main():
-    global cinema, tot, k
-    n = int(input())
-    a[1:] = [int(x) for x in input().split()]
-    for i in range(1, n + 1):
-        tot += 1; cinema[tot] = a[i]
-    m = int(input())
-    x[1:] = [int(x) for x in input().split()]
-    for i in range(1, m + 1):
-        tot += 1; cinema[tot] = x[i]
-    y[1:] = [int(x) for x in input().split()]
-    for i in range(1, m + 1):
-        tot += 1; cinema[tot] = y[i]
-    cinema[1:] = sorted(set(cinema[1 : tot + 1]))
-    k = len(cinema[1:])
-    for i in range(1, n + 1): ans[find(a[i])] += 1
-    ans0, ans1, ans2 = 1, 0, 0
-    for i in range(1, m + 1):
-        ansx, ansy = ans[find(x[i])], ans[find(y[i])]
-        if ansx > ans1 or (ansx == ans1 and ansy > ans2):
-            ans0, ans1, ans2 = i, ansx, ansy
-    print(ans0)
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+
+    n = int(input_data[0])
+    add = [int(x) for x in input_data[1 : n + 1]]
     
-main()
+    idx = n + 1
+    m = int(input_data[idx])
+    idx += 1
+    
+    b = [int(x) for x in input_data[idx : idx + m]]
+    idx += m
+    c = [int(x) for x in input_data[idx : idx + m]]
+    
+    all_vals = sorted(list(set(add + b + c)))
+    
+    def find(x):
+        return bisect.bisect_left(all_vals, x)
+        
+    a = [0] * len(all_vals)
+    for x in add:
+        a[find(x)] += 1
+        
+    res = 1
+    like = 0
+    sub = 0
+    
+    for i in range(m):
+        L = a[find(b[i])]
+        l = a[find(c[i])]
+        
+        if like < L:
+            like = L
+            sub = l
+            res = i + 1
+        elif like == L and sub < l:
+            sub = l
+            res = i + 1
+            
+    print(res)
+
+if __name__ == '__main__':
+    main()

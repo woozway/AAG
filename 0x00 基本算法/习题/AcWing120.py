@@ -1,38 +1,51 @@
-from math import inf
-N = 200006
-n, t, s, e, d = 0, 0, [0]*N, [0]*N, [0]*N
-def f(a, b, c):
-    return (b-a)//c + 1 if b>=a else 0
-    
-def le(r):
-    global n
-    ans = 0
-    for i in range(1, n+1): ans += f(s[i], min(e[i], r), d[i])
-    return ans
-    
-def Defense():
-    global n
-    n = int(input())
-    mins, maxe = inf, 0
-    for i in range(1, n+1):
-        s[i], e[i], d[i] = map(int, input().split())
-        mins = min(mins, s[i])
-        maxe = max(maxe, e[i])
-    
-    if le(maxe) % 2 == 0:
-        print("There's no weakness.")
-        return
-    
-    l, r = mins, maxe
-    while l < r:
-        mid = (l + r) >> 1
-        if le(mid) % 2: r = mid
-        else: l = mid + 1
-    print(l, le(l)-le(l-1))
+import sys
+
+def get_sum(n, seqs, x):
+    res = 0
+    for i in range(n):
+        s, e, d = seqs[i]
+        if s <= x:
+            res += (min(e, x) - s) // d + 1
+    return res
 
 def main():
-    global t
-    t = int(input())
-    for _ in range(t): Defense()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
     
-main()
+    idx = 0
+    T = int(input_data[idx])
+    idx += 1
+    
+    for _ in range(T):
+        n = int(input_data[idx])
+        idx += 1
+        seqs = []
+        l, r = 0, 0
+        for i in range(n):
+            s = int(input_data[idx])
+            e = int(input_data[idx + 1])
+            d = int(input_data[idx + 2])
+            idx += 3
+            seqs.append((s, e, d))
+            if e > r:
+                r = e
+        
+        while l < r:
+            mid = (l + r) // 2
+            if get_sum(n, seqs, mid) % 2 != 0:
+                r = mid
+            else:
+                l = mid + 1
+        
+        sum_r = get_sum(n, seqs, r)
+        sum_r_minus_1 = get_sum(n, seqs, r - 1)
+        count = sum_r - sum_r_minus_1
+        
+        if count % 2 != 0:
+            print(f"{r} {count}")
+        else:
+            print("There's no weakness.")
+
+if __name__ == '__main__':
+    main()

@@ -1,12 +1,21 @@
-N = 100006
-a = [0] * N
+import sys
+
 def main():
-    n = int(input())
-    a[1:] = [int(x) for x in input().split()]
-    a[1:] = sorted(a[1:])
-    ans = 0
-    for i in range(1, n // 2 + 1):
-        ans += a[n - i + 1] - a[i]
-    print(ans)
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
     
-main()
+    n = int(input_data[0])
+    a = [int(x) for x in input_data[1:]]
+    
+    a.sort()
+    
+    res = 0
+    median = a[n // 2]
+    for x in a:
+        res += abs(x - median)
+        
+    print(res)
+
+if __name__ == '__main__':
+    main()

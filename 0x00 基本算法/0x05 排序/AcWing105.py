@@ -1,34 +1,57 @@
-N = 100006
-x, y, s = [0] * N, [0] * N, [0] * N
-def main():
-    n, m, t = [int(k) for k in input().split()]
-    for i in range(1, t + 1): x[i], y[i] = [int(k) for k in input().split()]
-    row, column = not (t % n), not (t % m)
-    if not row and not column:
-        print("impossible")
-        return
-    elif row and column: print("both ", end='')
-    elif row: print("row ", end='')
-    else: print("column ", end='')
-    ans = 0
-    if row:
-        num = t // n
-        a = [0] * N
-        for i in range(1, t + 1): a[x[i]] += 1
-        for i in range(1, n + 1): a[i] -= num
-        s[0] = 0
-        for i in range(1, n + 1): s[i] = s[i - 1] + a[i]
-        s[1 : n + 1] = sorted(s[1 : n + 1])
-        for i in range(1, n // 2 + 1): ans += s[n - i + 1] - s[i]
-    if column:
-        num = t // m
-        a = [0] * N
-        for i in range(1, t + 1): a[y[i]] += 1
-        for i in range(1, m + 1): a[i] -= num
-        s[0] = 0
-        for i in range(1, m + 1): s[i] = s[i - 1] + a[i]
-        s[1 : m + 1] = sorted(s[1 : m + 1])
-        for i in range(1, m // 2 + 1): ans += s[m - i + 1] - s[i]
-    print(ans)
+import sys
+
+def calc(n, a):
+    s = [0] * (n + 1)
+    for i in range(1, n + 1):
+        s[i] = s[i - 1] + a[i]
+        
+    if s[n] % n != 0:
+        return -1
+        
+    b = s[n] // n
+    c = [0] * n
+    for i in range(1, n):
+        c[i] = i * b - s[i]
+        
+    c.sort()
     
-main()
+    mid = c[n // 2]
+    res = 0
+    for x in c:
+        res += abs(x - mid)
+    return res
+
+def main():
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    n = int(input_data[0])
+    m = int(input_data[1])
+    t = int(input_data[2])
+    
+    row = [0] * (n + 1)
+    col = [0] * (m + 1)
+    
+    idx = 3
+    for _ in range(t):
+        x = int(input_data[idx])
+        y = int(input_data[idx + 1])
+        idx += 2
+        row[x] += 1
+        col[y] += 1
+        
+    res1 = calc(n, row)
+    res2 = calc(m, col)
+    
+    if res1 != -1 and res2 != -1:
+        print(f"both {res1 + res2}")
+    elif res1 != -1:
+        print(f"row {res1}")
+    elif res2 != -1:
+        print(f"column {res2}")
+    else:
+        print("impossible")
+
+if __name__ == '__main__':
+    main()

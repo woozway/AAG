@@ -4,21 +4,23 @@
 # @return bool
 # return bool means whether a is less than b.
 
-class Solution(object):
-    def specialSort(self, N):
-        """
-        :type N: int
-        :rtype: List[int]
-        """
-        a = []
-        for i in range(N): a.append(i + 1)
-        for i in range(N):
-            k = a[i]
-            l, r = 0, k - 1
+class Solution:
+    def specialSort(self, n: int) -> list[int]:
+        res = [1]
+        for i in range(2, n + 1):
+            l, r = 0, len(res) - 1
             while l < r:
-                mid = (l + r) >> 1
-                if compare(k, a[mid]): r = mid
-                else: l = mid + 1
-            for j in range(i - 1, l - 1, -1): a[j + 1] = a[j]
-            a[l] = k
-        return a
+                mid = (l + r + 1) >> 1
+                if compare(res[mid], i):
+                    l = mid
+                else:
+                    r = mid - 1
+            
+            res.append(i)
+            for j in range(len(res) - 2, r, -1):
+                res[j], res[j + 1] = res[j + 1], res[j]
+            
+            if not compare(res[r], i):
+                res[r], res[r + 1] = res[r + 1], res[r]
+                
+        return res

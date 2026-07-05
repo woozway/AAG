@@ -1,46 +1,71 @@
-N = 1006
-n, p = 0, [[0] * 2 for _ in range(N)]
-k, lk, ans, la, ans0, la0 = [0] * 4 * N, 1, [0] * 4 * N, 1, [0] * 4 * N, 1
-def gj1(x):
-    global k, lk
-    for i in range(1, lk + 1): k[i] *= x
-    lk += 4
-    for i in range(1, lk + 1):
-        k[i + 1] += k[i] // 10
-        k[i] %= 10
-    while not k[lk]: lk -= 1
+import sys
 
-def gj2(x):
-    global k, lk, ans0, la0
-    w, flag = 0, True
-    for i in range(lk, 0, -1):
-        w = w * 10 + k[i]
-        ans0[i] = w // x
-        w %= x
-        if ans0[i] and flag:
-            la0 = i
-            flag = False
+def mul(A, b):
+    C = []
+    t = 0
+    i = 0
+    while i < len(A) or t:
+        if i < len(A):
+            t += A[i] * b
+        C.append(t % 10)
+        t //= 10
+        i += 1
+    while len(C) > 1 and C[-1] == 0:
+        C.pop()
+    return C
 
-def pd():
-    global ans, la, ans0, la0
-    if la != la0: return la < la0
-    for i in range(la, 0, -1):
-        if ans[i] != ans0[i]: return ans[i] < ans0[i]
-    return 0
-    
+def div(A, b):
+    C = []
+    r = 0
+    for i in range(len(A) - 1, -1, -1):
+        r = r * 10 + A[i]
+        C.append(r // b)
+        r %= b
+    C.reverse()
+    while len(C) > 1 and C[-1] == 0:
+        C.pop()
+    return C
+
+def max_vec(A, B):
+    if len(A) > len(B):
+        return A
+    if len(A) < len(B):
+        return B
+    for i in range(len(A) - 1, -1, -1):
+        if A[i] > B[i]:
+            return A
+        if A[i] < B[i]:
+            return B
+    return A
+
 def main():
-    global n, p, k, ans, ans0, la, la0
-    n = int(input())
-    for i in range(n+1): p[i] = [int(x) for x in input().split()]
-    p[1 : n + 1] = sorted(p[1 : n + 1], key=lambda x: x[0] * x[1])
-    k[1] = 1
-    gj1(p[0][0])
-    for i in range(1, n + 1):
-        gj2(p[i][1])
-        if pd():
-            ans = ans0[:]
-            la = la0
-        gj1(p[i][0])
-    for i in range(la, 0, -1): print(ans[i], end='')
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
     
-main()
+    n = int(input_data[0])
+    p = []
+    idx = 1
+    for i in range(n + 1):
+        a = int(input_data[idx])
+        b = int(input_data[idx + 1])
+        p.append((a * b, a))
+        idx += 2
+        
+    p_king = p[0]
+    p_ministers = sorted(p[1:])
+    p = [p_king] + p_ministers
+    
+    product = [1]
+    res = [0]
+    
+    for i in range(n + 1):
+        if i > 0:
+            val = div(product, p[i][0] // p[i][1])
+            res = max_vec(res, val)
+        product = mul(product, p[i][1])
+        
+    print("".join(map(str, res[::-1])))
+
+if __name__ == '__main__':
+    main()

@@ -1,18 +1,46 @@
-N = 2506
+import sys
+import bisect
+
 def main():
-    c, l = map(int, input().split())
-    cow, spf = [0] * N, [0] * N
-    for i in range(1, c + 1): cow[i] = list(map(int, input().split()))
-    for i in range(1, l + 1): spf[i] = list(map(int, input().split()))
-    cow[1 : c + 1] = sorted(cow[1 : c + 1], key=lambda x: x[0], reverse=True)
-    spf[1 : l + 1] = sorted(spf[1 : l + 1], key=lambda x: x[0], reverse=True)
-    ans = 0
-    for i in range(1, c + 1):
-        for j in range(1, l + 1):
-            if spf[j][1] and spf[j][0] >= cow[i][0] and spf[j][0] <= cow[i][1]:
-                ans += 1
-                spf[j][1] -= 1
-                break
-    print(ans)
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
     
-main()
+    n = int(input_data[0])
+    m = int(input_data[1])
+    
+    cows = []
+    idx = 2
+    for i in range(n):
+        cows.append((int(input_data[idx]), int(input_data[idx + 1])))
+        idx += 2
+        
+    spf_map = {}
+    for i in range(m):
+        s = int(input_data[idx])
+        c = int(input_data[idx + 1])
+        spf_map[s] = spf_map.get(s, 0) + c
+        idx += 2
+        
+    cows.sort()
+    
+    spf_keys = sorted(spf_map.keys())
+    
+    res = 0
+    for i in range(n - 1, -1, -1):
+        min_spf, max_spf = cows[i]
+        
+        pos = bisect.bisect_right(spf_keys, max_spf)
+        if pos > 0:
+            spf_val = spf_keys[pos - 1]
+            if spf_val >= min_spf:
+                res += 1
+                spf_map[spf_val] -= 1
+                if spf_map[spf_val] == 0:
+                    spf_keys.pop(pos - 1)
+                    del spf_map[spf_val]
+                    
+    print(res)
+
+if __name__ == '__main__':
+    main()

@@ -1,17 +1,33 @@
-N = 10006
-n, x, y = 0, [0]*N, [0]*N
+import sys
+
+def work(q, n):
+    q.sort()
+    res = 0
+    median = q[n // 2]
+    for val in q:
+        res += abs(val - median)
+    return res
 
 def main():
-    global n, x, y
-    n = int(input())
-    for i in range(1, n+1): x[i], y[i] = map(int, input().split())
-    x[1:n+1] = sorted(x[1:n+1])
-    y[1:n+1] = sorted(y[1:n+1])
-    for i in range(1, n+1): x[i] -= i
-    x[1:n+1] = sorted(x[1:n+1])
-    ans = 0
-    for i in range(1, n//2+1):
-        ans += x[n+1-i]-x[i] + y[n+1-i]-y[i]
-    print(ans)
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
     
-main()
+    n = int(input_data[0])
+    x = [0] * n
+    y = [0] * n
+    
+    idx = 1
+    for i in range(n):
+        x[i] = int(input_data[idx])
+        y[i] = int(input_data[idx + 1])
+        idx += 2
+        
+    x.sort()
+    for i in range(n):
+        x[i] -= i
+        
+    print(work(x, n) + work(y, n))
+
+if __name__ == '__main__':
+    main()

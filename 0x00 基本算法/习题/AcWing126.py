@@ -1,32 +1,30 @@
-from math import inf
-N = 106
-a = [[0]*N for _ in range(N)]
+import sys
 
-def rd(n):
-    nums = []
-    while True:
-        try:
-            line = input().strip()
-            nums.extend(map(int, line.split()))
-        except:
-            break
-    for i in range(1, n+1):
-        a[i][1:] = nums[(i-1)*n:(i*n)]
-    return a
-    
 def main():
-    n = int(input())
-    a = rd(n)
-    ans = -inf
-    for i in range(1, n+1):
-        x = [0]*N
-        for j in range(i, n+1):
-            num = 0
-            for k in range(1, n+1):
-                x[k] += a[j][k]
-                num += x[k]
-                ans = max(ans, num)
-                if num < 0: num = 0
-    print(ans)
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
     
-main()
+    n = int(input_data[0])
+    g = [[0 for _ in range(n + 1)] for _ in range(n + 1)]
+    
+    idx = 1
+    for i in range(1, n + 1):
+        for j in range(1, n + 1):
+            g[i][j] = int(input_data[idx])
+            idx += 1
+            g[i][j] += g[i - 1][j]
+            
+    res = -float('inf')
+    for i in range(1, n + 1):
+        for j in range(i, n + 1):
+            last = 0
+            for k in range(1, n + 1):
+                col_sum = g[j][k] - g[i - 1][k]
+                last = max(last, 0) + col_sum
+                res = max(res, last)
+                
+    print(res)
+
+if __name__ == '__main__':
+    main()

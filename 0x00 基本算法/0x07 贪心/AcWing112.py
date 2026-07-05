@@ -1,34 +1,42 @@
-from math import inf, sqrt
-N = 1006
-n, d, p = 0, 0, [[0] * 4 for _ in range(N)] # p[i]=[x,y,l,r]
-def Radar_Installation():
-    global n, d, p
-    for i in range(1, n + 1): p[i][:2] = list(map(int, input().split()))
-    b = True
-    for i in range(1, n + 1):
-        if p[i][1] > d:
-            b = False
-            break
-    if not b:
-        print("-1")
-        return
-    for i in range(1, n + 1):
-        k = sqrt(d ** 2 - p[i][1] ** 2)
-        p[i][2:] = p[i][0] - k, p[i][0] + k
-    p[1 : n + 1] = sorted(p[1 : n + 1], key=lambda x: x[2])
-    ans = 0
-    pos = -inf
-    for i in range(1, n + 1):
-        if pos < p[i][2]:
-            ans += 1
-            pos = p[i][3]
-        else:
-            pos = min(p[i][3], pos)
-    print(ans)
+import sys
+import math
 
 def main():
-    global n, d
-    n, d = map(int, input().split())
-    Radar_Installation()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    
+    n = int(input_data[0])
+    d = int(input_data[1])
+    
+    seg = []
+    success = True
+    
+    idx = 2
+    for i in range(n):
+        x = int(input_data[idx])
+        y = int(input_data[idx + 1])
+        idx += 2
+        
+        if y > d:
+            success = False
+            break
+        
+        len_val = math.sqrt(d * d - y * y)
+        seg.append((x + len_val, x - len_val))
+    
+    if not success:
+        print("-1")
+    else:
+        seg.sort()
+        res = 0
+        last = -1e10
+        
+        for r, l in seg:
+            if l > last + 1e-6:
+                res += 1
+                last = r
+        print(res)
 
-main()
+if __name__ == '__main__':
+    main()

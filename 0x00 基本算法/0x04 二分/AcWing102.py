@@ -1,20 +1,40 @@
-from math import inf
-a, b, s = [0] * 100001, [0] * 100001, [0] * 100001
-def main():
-    N, L = [int(x) for x in input().split()]
-    for i in range(1, N + 1): a[i] = int(input())
-    eps = 1e-5
-    l, r = 1, 1e6
-    while r - l > eps:
-        mid = (l + r) / 2
-        for i in range(1, N + 1): b[i] = a[i] - mid
-        for i in range(1, N + 1): s[i] = s[i - 1] + b[i]
-        ans, min_val = -inf, inf
-        for i in range(L, N + 1):
-            min_val = min(min_val, s[i - L])
-            ans = max(ans, s[i] - min_val)
-        if ans >= 0: l = mid
-        else: r = mid
-    print(int(r * 1000))
+import sys
+
+def check(avg, n, m, cows, sum_arr):
+    for i in range(1, n + 1):
+        sum_arr[i] = sum_arr[i - 1] + (cows[i] - avg)
     
-main()
+    mins = 0
+    for i in range(m, n + 1):
+        mins = min(mins, sum_arr[i - m])
+        if sum_arr[i] - mins >= 0:
+            return True
+    return False
+
+def main():
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    
+    n = int(input_data[0])
+    m = int(input_data[1])
+    cows = [0] * (n + 1)
+    r = 0.0
+    for i in range(1, n + 1):
+        cows[i] = int(input_data[i + 1])
+        r = max(r, float(cows[i]))
+        
+    l = 0.0
+    sum_arr = [0.0] * (n + 1)
+    
+    while r - l > 1e-5:
+        mid = (l + r) / 2
+        if check(mid, n, m, cows, sum_arr):
+            l = mid
+        else:
+            r = mid
+            
+    print(int(r * 1000))
+
+if __name__ == '__main__':
+    main()

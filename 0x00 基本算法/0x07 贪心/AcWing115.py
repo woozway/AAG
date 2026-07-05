@@ -1,41 +1,61 @@
-N = 1006
-n, r = 0, 0
-fa, nxt, lst, num = [0] * N, [0] * N, [0] * N, [0] * N
-c, d, tot, v = [0] * N, [0] * N, [0] * N, [0] * N
-def Color_a_Tree():
-    global n, r, fa, nxt, lst, num, c, d, tot, v
-    c[1 : n + 1] = [int(x) for x in input().split()]
-    nxt[1 : n + 1] = list(range(1, n + 1))
-    lst[1 : n + 1] = list(range(1, n + 1))
-    num[1 : n + 1] = [1] * n
-    tot[1 : n + 1] = c[1 : n + 1][:]
-    d = c[:]
-    for _ in range(1, n):
-        a, b = map(int, input().split())
-        fa[b] = a
-    for i in range(1, n):
-        p, k = 0, 0
-        for j in range(1, n + 1):
-            if j != r and not v[j] and c[j] > k:
-                k = c[j]
-                p = j
-        f = fa[p]
-        while v[f]: fa[p] = f = fa[f]
-        nxt[lst[f]] = p
-        lst[f] = lst[p]
-        num[f] += num[p]
-        tot[f] += tot[p]
-        c[f] = tot[f] / num[f]
-        v[p] = 1
-    ans = 0
+import sys
+
+class Node:
+    def __init__(self, v):
+        self.p = 0
+        self.s = 1
+        self.v = v
+        self.avg = float(v)
+
+def find(n, root, nodes):
+    avg = 0.0
+    res = -1
     for i in range(1, n + 1):
-        ans += i * d[r]
-        r = nxt[r]
-    print(ans)
+        if i != root and nodes[i].avg > avg:
+            avg = nodes[i].avg
+            res = i
+    return res
 
 def main():
-    global n, r
-    n, r = map(int, input().split())
-    Color_a_Tree()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    
+    n = int(input_data[0])
+    root = int(input_data[1])
+    
+    nodes = [Node(0) for _ in range(n + 1)]
+    ans = 0
+    
+    idx = 2
+    for i in range(1, n + 1):
+        v = int(input_data[idx])
+        idx += 1
+        nodes[i] = Node(v)
+        ans += v
+        
+    for i in range(n - 1):
+        a = int(input_data[idx])
+        b = int(input_data[idx + 1])
+        idx += 2
+        nodes[b].p = a
+        
+    for i in range(n - 1):
+        p = find(n, root, nodes)
+        father = nodes[p].p
+        
+        ans += nodes[p].v * nodes[father].s
+        nodes[p].avg = -1.0
+        
+        for j in range(1, n + 1):
+            if nodes[j].p == p:
+                nodes[j].p = father
+                
+        nodes[father].v += nodes[p].v
+        nodes[father].s += nodes[p].s
+        nodes[father].avg = nodes[father].v / nodes[father].s
+        
+    print(ans)
 
-main()
+if __name__ == '__main__':
+    main()

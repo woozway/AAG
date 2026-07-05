@@ -1,18 +1,23 @@
-n, chosen = 0, []
-def calc(x):
-    if x == n + 1:
-        for i in range(len(chosen)):
-            print("%d " % chosen[i], end='')
-        print()
-        return
-    calc(x + 1)
-    chosen.append(x)
-    calc(x + 1)
-    chosen.pop()
+import sys
 
 def main():
-    global n
-    n = int(input())
-    calc(1)
-    
-main()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    n = int(input_data[0])
+
+    def dfs(u, state):
+        if u == n:
+            for i in range(n):
+                if (state >> i) & 1:
+                    print(i + 1, end=' ')
+            print()
+            return
+
+        dfs(u + 1, state)
+        dfs(u + 1, state + (1 << u))
+
+    dfs(0, 0)
+
+if __name__ == '__main__':
+    main()

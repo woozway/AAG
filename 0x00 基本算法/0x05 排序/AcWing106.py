@@ -1,36 +1,49 @@
-from heapq import heappush, heappop
-def rd(m):
-    v = []
-    while len(v) < m:
-        v.extend([int(x) for x in input().split()])
-    return v
-    
-def Running_Median():
-    q1, q2 = [], []
-    num, n = [int(x) for x in input().split()]
-    print(num, (n + 1) // 2)
-    v = rd(n)
-    print(v[0], end='')
-    heappush(q2, v[0])
-    cnt = 1
-    for i in range(2, n + 1):
-        a = v[i - 1]
-        if a < q2[0]: heappush(q1, -a)
-        else: heappush(q2, a)
-        s = len(q1)
-        if s > i // 2:
-            heappush(q2, -heappop(q1))
-        if s < i // 2:
-            heappush(q1, -heappop(q2))
-        if i % 2:
-            if cnt % 10: print(' ', end='')
-            print(q2[0], end='')
-            cnt += 1
-            if cnt % 10 == 0: print()
-    if cnt % 10: print()
+import sys
+import heapq
 
 def main():
-    t = int(input())
-    for _ in range(t): Running_Median()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    
+    idx = 0
+    T_cases = int(input_data[idx])
+    idx += 1
+    
+    for _ in range(T_cases):
+        m = int(input_data[idx])
+        n = int(input_data[idx + 1])
+        idx += 2
+        
+        max_heap = []
+        min_heap = []
+        
+        print(f"{m} {(n + 1) // 2}")
+        
+        cnt = 0
+        for i in range(n):
+            t = int(input_data[idx])
+            idx += 1
+            
+            heapq.heappush(max_heap, -t)
+            
+            if min_heap and min_heap[0] < -max_heap[0]:
+                a = heapq.heappop(min_heap)
+                b = -heapq.heappop(max_heap)
+                heapq.heappush(min_heap, b)
+                heapq.heappush(max_heap, -a)
+            
+            if len(max_heap) > len(min_heap) + 1:
+                heapq.heappush(min_heap, -heapq.heappop(max_heap))
+            
+            if i % 2 == 0:
+                print(f"{-max_heap[0]}", end=" ")
+                cnt += 1
+                if cnt % 10 == 0:
+                    print()
+        
+        if cnt % 10 != 0:
+            print()
 
-main()
+if __name__ == '__main__':
+    main()

@@ -1,35 +1,50 @@
+import sys
 from bisect import bisect_left
-N, M = 100006, 100006
-p = [[0]*2 for _ in range(N)]
-t = [[] for _ in range(M)]
-n, m = 0, 0
-
-def Task():
-    global n, m
-    for i in range(1, n+1):
-        x, y = map(int, input().split())
-        t[y].append(x)
-    for i in range(101): t[i].sort()
-    for i in range(1, m+1): p[i] = [int(x) for x in input().split()]
-    p[1:m+1] = sorted(p[1:m+1], key=lambda x: (x[0], x[1]), reverse=True)
-    ans, ansa = 0, 0
-    for i in range(1, m+1):
-        flag = 0
-        for j in range(p[i][1], 101):
-            s = len(t[j])
-            it = bisect_left(t[j], p[i][0])
-            if it != s:
-                t[j].pop(it)
-                flag = 1
-                break
-        if flag:
-            ans += 1
-            ansa += 500*p[i][0] + 2*p[i][1]
-    print(ans, ansa)
 
 def main():
-    global n, m
-    n, m = map(int, input().split())
-    Task()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
     
-main()
+    idx = 0
+    while idx < len(input_data):
+        n = int(input_data[idx])
+        m = int(input_data[idx + 1])
+        idx += 2
+        
+        mchs = []
+        for i in range(n):
+            mchs.append((int(input_data[idx]), int(input_data[idx + 1])))
+            idx += 2
+            
+        tasks = []
+        for i in range(m):
+            tasks.append((int(input_data[idx]), int(input_data[idx + 1])))
+            idx += 2
+            
+        mchs.sort()
+        tasks.sort()
+        
+        ys = []
+        cnt = 0
+        res = 0
+        
+        j = n - 1
+        for i in range(m - 1, -1, -1):
+            x, y = tasks[i]
+            while j >= 0 and mchs[j][0] >= x:
+                ys.append(mchs[j][1])
+                j -= 1
+            
+            ys.sort()
+            pos = bisect_left(ys, y)
+            
+            if pos < len(ys):
+                cnt += 1
+                res += 500 * x + 2 * y
+                ys.pop(pos)
+                
+        print(f"{cnt} {res}")
+
+if __name__ == '__main__':
+    main()

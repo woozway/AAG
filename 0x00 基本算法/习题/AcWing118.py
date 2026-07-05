@@ -1,33 +1,47 @@
-N = 730
-n, p = 0, [0] * 8
-a = [[False] * N for _ in range(N)]
+import sys
 
-def fractal(k, x, y):
-    if k == 1:
-        a[x][y] = True
+def dfs(g, n):
+    if n == 1:
+        g[0][0] = 'X'
         return
-    fractal(k - 1, x, y)
-    fractal(k - 1, x, y + 2 * p[k - 1])
-    fractal(k - 1, x + p[k - 1], y + p[k - 1]);
-    fractal(k - 1, x + 2 * p[k - 1], y);
-    fractal(k - 1, x + 2 * p[k - 1], y + 2 * p[k - 1]);
     
-def Fractal():
-    global n
-    fractal(n, 1, 1)
-    for i in range(1, p[n] + 1):
-        for j in range(1, p[n] + 1):
-            print('X' if a[i][j] else ' ', end='')
-        print()
-    print('-')
+    dfs(g, n - 1)
     
-def main():
-    global n
-    p[1] = 1
-    for i in range(2, 8): p[i] = p[i - 1] * 3
-    while True:
-        n = int(input())
-        if n == -1: break
-        Fractal()
+    length = 1
+    for i in range(n - 2):
+        length *= 3
+        
+    sx = [0, 1, 2, 2]
+    sy = [2, 1, 0, 2]
+    
+    for k in range(4):
+        for i in range(length):
+            for j in range(length):
+                g[sx[k] * length + i][sy[k] * length + j] = g[i][j]
 
-main()
+def main():
+    max_len = 1
+    for i in range(6):
+        max_len *= 3
+    
+    g = [[' ' for _ in range(max_len)] for _ in range(max_len)]
+    dfs(g, 7)
+    
+    input_data = sys.stdin.read().split()
+    idx = 0
+    while idx < len(input_data):
+        n = int(input_data[idx])
+        idx += 1
+        if n == -1:
+            break
+        
+        k = 1
+        for i in range(n - 1):
+            k *= 3
+            
+        for i in range(k):
+            print("".join(g[i][:k]))
+        print('-')
+
+if __name__ == '__main__':
+    main()

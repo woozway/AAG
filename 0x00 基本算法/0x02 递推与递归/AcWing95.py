@@ -1,47 +1,62 @@
-N = 6
-a, aa, ans = None, None, 0
+import sys
+import copy
 
-def dj(x, y):
-    global aa
-    aa[x] ^= (1 << y)
-    if x != 1: aa[x - 1] ^= (1 << y)
-    if x != 5: aa[x + 1] ^= (1 << y)
-    if y != 0: aa[x] ^= (1 << (y - 1))
-    if y != 4: aa[x] ^= (1 << (y + 1))
+INF = 0x3f3f3f3f
+g = []
+dx = [0, -1, 0, 1, 0]
+dy = [0, 0, 1, 0, -1]
 
-def pd(p):
-    global aa, ans
-    k = 0
-    aa = a[:]
+def turn(x, y):
     for i in range(5):
-        if not ((p >> i) & 1):
-            dj(1, i)
-            k += 1
-            if k >= ans: return
-    for x in range(1, 5):
-        for y in range(5):
-            if not ((aa[x] >> y) & 1):
-                dj(x + 1, y)
-                k += 1
-                if k >= ans: return
-    if aa[5] == 31: ans = k
-    
-def abc():
-    global a, ans
-    a = [0] * N
-    for i in range(1, 6):
-        while True:
-            s = input().strip()
-            if s:
-                a[i] = int(s, 2)
+        a, b = x + dx[i], y + dy[i]
+        if 0 <= a < 5 and 0 <= b < 5:
+            g[a][b] = '1' if g[a][b] == '0' else '0'
+
+def work():
+    ans = INF
+    for k in range(1 << 5):
+        res = 0
+        backup = copy.deepcopy(g)
+        
+        for j in range(5):
+            if (k >> j) & 1:
+                res += 1
+                turn(0, j)
+        
+        for i in range(4):
+            for j in range(5):
+                if g[i][j] == '0':
+                    res += 1
+                    turn(i + 1, j)
+        
+        is_successful = True
+        for j in range(5):
+            if g[4][j] == '0':
+                is_successful = False
                 break
-    ans = 7
-    for p in range(1 << 5): pd(p)
-    print(-1 if ans == 7 else ans)
+        
+        if is_successful:
+            ans = min(ans, res)
+        
+        for i in range(5):
+            g[i] = backup[i][:]
+            
+    if ans > 6:
+        return -1
+    return ans
 
 def main():
-    n = int(input())
-    for _ in range(n):
-        abc()
- 
-main()   
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    T = int(input_data[0])
+    curr = 1
+    for _ in range(T):
+        for i in range(5):
+            g.append(list(input_data[curr]))
+            curr += 1
+        print(work())
+        g.clear()
+
+if __name__ == '__main__':
+    main()

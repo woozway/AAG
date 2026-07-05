@@ -1,15 +1,31 @@
-from math import inf
-N = 50006
-p = [[0]*2 for _ in range(N)]
+import sys
 
 def main():
-    n = int(input())
-    for i in range(1, n+1): p[i] = list(map(int, input().split()))
-    p[1:n+1] = sorted(p[1:n+1], key=lambda x: x[0]+x[1])
-    ans, k = -inf, 0
-    for i in range(1, n+1):
-        ans = max(ans, k - p[i][1])
-        k += p[i][0]
-    print(ans)
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
     
-main()
+    n = int(input_data[0])
+    cows = []
+    idx = 1
+    for i in range(n):
+        w = int(input_data[idx])
+        s = int(input_data[idx + 1])
+        idx += 2
+        cows.append((w + s, w))
+        
+    cows.sort()
+    
+    res = -2 * 10**9
+    sum_w = 0
+    
+    for i in range(n):
+        s_val = cows[i][0] - cows[i][1]
+        w_val = cows[i][1]
+        res = max(res, sum_w - s_val)
+        sum_w += w_val
+        
+    print(res)
+
+if __name__ == '__main__':
+    main()

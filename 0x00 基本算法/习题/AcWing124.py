@@ -1,33 +1,54 @@
-N = 1006
-ch2n, n2ch = [0]*200, [0]*200
-s, ans = [0]*N, [0]*N
-
-def NUMVER_BASE_CONVERSION():
-    a, b, c = input().split()
-    a, b, s[:len(c)] = int(a), int(b), list(c)
-    print(f"{a} {c}\n{b} ", end='')
-    _len, t, i = len(c), len(c), 0
-    while t:
-        k = 0
-        for j in range(_len-t, _len):
-            k = k*a + ch2n[ord(s[j])]
-            s[j] = n2ch[k//b]
-            k %= b
-        ans[i] = n2ch[k]
-        while t>0 and s[_len-t]=='0': t -= 1
-        i += 1
-    for j in range(i-1, -1, -1): print(ans[j], end='')
-    print("\n")
+import sys
 
 def main():
-    t = 0
-    for i in range(ord('0'), ord('9')+1):
-        ch2n[i] = t; n2ch[t] = chr(i); t += 1
-    for i in range(ord('A'), ord('Z')+1):
-        ch2n[i] = t; n2ch[t] = chr(i); t += 1
-    for i in range(ord('a'), ord('z')+1):
-        ch2n[i] = t; n2ch[t] = chr(i); t += 1
-    t = int(input())
-    for _ in range(t): NUMVER_BASE_CONVERSION()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    
+    T = int(input_data[0])
+    idx = 1
+    
+    for _ in range(T):
+        a = int(input_data[idx])
+        b = int(input_data[idx + 1])
+        a_line = input_data[idx + 2]
+        idx += 3
+        
+        number = []
+        for c in a_line:
+            if '0' <= c <= '9':
+                number.append(ord(c) - ord('0'))
+            elif 'A' <= c <= 'Z':
+                number.append(ord(c) - ord('A') + 10)
+            else:
+                number.append(ord(c) - ord('a') + 36)
+        
+        number.reverse()
+        
+        res = []
+        while number:
+            t = 0
+            for i in range(len(number) - 1, -1, -1):
+                number[i] += t * a
+                t = number[i] % b
+                number[i] //= b
+            res.append(t)
+            while number and number[-1] == 0:
+                number.pop()
+        
+        res.reverse()
+        b_line = ""
+        for x in res:
+            if x <= 9:
+                b_line += chr(ord('0') + x)
+            elif x <= 35:
+                b_line += chr(ord('A') + x - 10)
+            else:
+                b_line += chr(ord('a') + x - 36)
+        
+        print(f"{a} {a_line}")
+        print(f"{b} {b_line}")
+        print()
 
-main()
+if __name__ == '__main__':
+    main()

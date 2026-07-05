@@ -1,49 +1,93 @@
-from math import inf, sqrt
-N = 100006
-p, tmp = [[0]*3 for _ in range(N*2)], [[0]*3 for _ in range(N*2)]
+import sys
+import math
+import random
+
+INF = 1e10
+
+class Point:
+    def __init__(self, x, y, t):
+        self.x = x
+        self.y = y
+        self.type = t
 
 def dist(a, b):
-    if a[2] == b[2]: return inf
-    return sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]))
+    if a.type == b.type:
+        return INF
+    dx = a.x - b.x
+    dy = a.y - b.y
+    return math.sqrt(dx * dx + dy * dy)
 
-def s(l, r):
-    if l == r: return inf
-    if l+1 == r: return dist(p[l], p[r])
-    mid = (l+r)>>1
-    ans = min(s(l, mid), s(mid+1, r))
+def dfs(points, l, r):
+    if l >= r:
+        return INF
     
-    i, j = l, mid+1
-    for k in range(l, r+1):
-        if j>r or (i<=mid and p[i][1]<=p[j][1]): tmp[k] = p[i]; i += 1
-        else: tmp[k] = p[j]; j += 1
-    for k in range(l, r+1): p[k] = tmp[k]
+    mid = (l + r) // 2
+    mid_x = points[mid].x
     
+    res = min(dfs(points, l, mid), dfs(points, mid + 1, r))
+    
+    temp = [None] * (r - l + 1)
+    i, j = l, mid + 1
     k = 0
-    for i in range(mid, l-1, -1):
-        if k >= 6: break
-        if p[mid][0]-ans <= p[i][0] <= p[mid][0]+ans: tmp[k] = p[i]; k += 1
-    for i in range(mid+1, r+1):
-        if k >= 12: break
-        if p[mid][0]-ans <= p[i][0] <= p[mid][0]+ans: tmp[k] = p[i]; k += 1
+    while i <= mid and j <= r:
+        if points[i].y < points[j].y:
+            temp[k] = points[i]
+            i += 1
+        else:
+            temp[k] = points[j]
+            j += 1
+        k += 1
+    while i <= mid:
+        temp[k] = points[i]
+        i += 1
+        k += 1
+    while j <= r:
+        temp[k] = points[j]
+        j += 1
+        k += 1
     
-    for i in range(1, k):
-        for j in range(i-1, -1, -1):
-            if tmp[i][1] - tmp[j][1] < ans: ans = min(ans, dist(tmp[i], tmp[j]))
-    return ans
-    
-def Raid():
-    n = int(input())
-    for i in range(1, n+1):
-        p[i][:2] = map(int, input().split())
-        p[i][2] = 0
-    for i in range(1, n+1):
-        p[i+n][:2] = map(int, input().split())
-        p[i][2] = 1
-    p[1:2*n+1] = sorted(p[1:2*n+1], key=lambda x: x[0])
-    print("%.3f" % s(1, 2*n))
-    
-def main():
-    t = int(input())
-    for _ in range(t): Raid()
+    for i in range(len(temp)):
+        points[l + i] = temp[i]
+        
+    candidates = []
+    for i in range(l, r + 1):
+        if abs(points[i].x - mid_x) < res:
+            candidates.append(points[i])
+            
+    for i in range(len(candidates)):
+        for j in range(i - 1, -1, -1):
+            if candidates[i].y - candidates[j].y >= res:
+                break
+            res = min(res, dist(candidates[i], candidates[j]))
+            
+    return res
 
-main()
+def main():
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    
+    idx = 0
+    T = int(input_data[idx])
+    idx += 1
+    
+    for _ in range(T):
+        n = int(input_data[idx])
+        idx += 1
+        
+        points = []
+        for i in range(n):
+            points.append(Point(float(input_data[idx]), float(input_data[idx + 1]), 0))
+            idx += 2
+        for i in range(n):
+            points.append(Point(float(input_data[idx]), float(input_data[idx + 1]), 1))
+            idx += 2
+            
+        random.shuffle(points)
+        points.sort(key=lambda p: p.x)
+        
+        ans = dfs(points, 0, 2 * n - 1)
+        print(f"{ans:.3f}")
+
+if __name__ == '__main__':
+    main()
