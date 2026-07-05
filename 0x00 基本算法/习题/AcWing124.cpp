@@ -1,47 +1,45 @@
-#include <cstdio>
-#include <cstring>
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 1006;
-// ch2n[i]存放字符i对应的10进制下的数字，ff中存放原始字符[0-9A-Za-z]
-int ch2n[200], n2ch[100];
-char s[N], ans[N];
-// 这里用短除法直接a转b进制（也可以先转为十进制数：秦九韶+短除法）
-void NUMBER_BASE_CONVERSION() {
-  int a, b;
-  cin >> a >> b;
-  scanf("%s", s);
-  cout << a << " " << s << endl << b << " ";
-  int len = strlen(s), t = strlen(s), i;
-  for (i=0; t; i++) {
-    int k = 0; // a进制中前一高位用于后一位计算的借位
-    for (int j=len-t; j<len; j++) {
-      k = k*a + ch2n[s[j]];
-      s[j] = n2ch[k/b];
-      k %= b;
-    }
-    ans[i] = n2ch[k]; // 获取b进制数的一位（从个位开始往高位）
-    while (t>0 && s[len-t]=='0') t--; // 除去前导0
-  }
-  while (--i >= 0) cout << ans[i];
-  cout << endl << endl;
-}
 
 int main() {
-  int t = 0;
-  for (int i='0'; i<='9'; i++) {
-    ch2n[i] = t;
-    n2ch[t++] = i;
+  int T;
+  cin >> T;
+  while (T -- ) {
+    int a, b;
+    string a_line;
+    cin >> a >> b >> a_line;
+
+    vector<int> number;
+    for (auto c : a_line)
+      if (c <= '9') number.push_back(c - '0');
+      else if (c <= 'Z') number.push_back(c - 'A' + 10);
+      else number.push_back(c - 'a' + 36);
+
+    reverse(number.begin(), number.end());
+
+    vector<int> res;
+    // 高精度短除法（除基取余）：只要这个大整数还没有被完全除尽，就继续除以 b
+    while (number.size()) {
+      int t = 0; // t 用来暂存高位向下传递的余数
+      for (int i = number.size() - 1; i >= 0; i -- ) {
+        number[i] += t * a;
+        t = number[i] % b;
+        number[i] /= b;
+      }
+      res.push_back(t);
+      while (number.size() && !number.back()) number.pop_back();
+    }
+
+    reverse(res.begin(), res.end()); // 余数倒过来
+    string b_line;
+    for (auto x : res)
+      if (x <= 9) b_line += char('0' + x);
+      else if (x <= 35) b_line += char('A' + x - 10);
+      else b_line += char('a' + x - 36);
+
+    cout << a << ' ' << a_line << endl;
+    cout << b << ' ' << b_line << endl;
+    cout << endl;
   }
-  for (int i='A'; i<='Z'; i++) {
-    ch2n[i] = t;
-    n2ch[t++] = i;
-  }
-  for (int i='a'; i<='z'; i++) {
-    ch2n[i] = t;
-    n2ch[t++] = i;
-  }
-  cin >> t;
-  while (t--) NUMBER_BASE_CONVERSION();
   return 0;
 }

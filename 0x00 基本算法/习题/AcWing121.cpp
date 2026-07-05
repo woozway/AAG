@@ -1,49 +1,64 @@
-#include <iostream>
-#include <cstring>
+#include <bits/stdc++.h>
 using namespace std;
-const int MAX = 10006, N = 506;
-int xx[MAX], yy[MAX];
-int c, n, tx = 0, ty = 0;
-int x[N], y[N], s[N][N];
-struct P {
-  int x, y;
-} p[N];
+typedef pair<int, int> PII;
+const int N = 1010;
+int n, C;
+PII points[N];
+int sum[N][N];
+vector<int> numbers; // 用于离散化的数组，存储所有出现过的 X 和 Y 坐标
 
-bool pd(int k) {
-  for (int i=xx[k]; i<=tx; i++)
-    for (int j=yy[k]; j<=ty; j++) {
-      int x0 = 0, y0 = 0; // 映射到同一个i的原始坐标不一定哪个大
-      if (x[i]-k >= 0) x0 = xx[x[i]-k];
-      if (y[j]-k >= 0) y0 = yy[y[j]-k];
-      if (s[i][j] - s[x0][j] - s[i][y0] + s[x0][y0] >= c) return 1;
+bool check(int len) { // 检查是否存在一个边长为 len 的正方形，能覆盖至少 C 个点
+  // 双指针 x1 和 x2 代表我们要查询的 [真实的左右离散边界]
+  for (int x1 = 1, x2 = 1; x2 < numbers.size(); x2 ++ ) {
+    // 物理宽度 = 右边界的物理坐标 - 左边界的物理坐标 + 1，若超标，左边界 x1 必须向右收缩
+    while (numbers[x2] - numbers[x1] + 1 > len) x1 ++ ;
+    for (int y1 = 1, y2 = 1; y2 < numbers.size(); y2 ++ ) {
+      while (numbers[y2] - numbers[y1] + 1 > len) y1 ++ ;
+      if (sum[x2][y2] - sum[x1 - 1][y2] - sum[x2][y1 - 1] + sum[x1 - 1][y1 - 1] >= C)
+        return true;
     }
-  return 0;
+  }
+  return false;
+}
+
+int find(int x) { // 二分查找实现 lower_bound：在去重后的 numbers 数组中找 x 的索引
+  int l = 0, r = numbers.size() - 1;
+  while (l < r) {
+    int mid = l + r >> 1;
+    if (numbers[mid] >= x) r = mid;
+    else l = mid + 1;
+  }
+  return l;
 }
 
 int main() {
-  memset(xx, 0, sizeof(xx));
-  memset(yy, 0, sizeof(yy));
-  memset(s, 0, sizeof(s));
-  cin >> c >> n;
-  for (int i=1; i<=n; i++) { // xx[i]表示在横坐标区域[i,i+1)内的三叶草的数量
-    cin >> p[i].x >> p[i].y;
-    xx[p[i].x]++;
-    yy[p[i].y]++;
+  cin >> C >> n;
+  numbers.push_back(0); // 放入一个 0 作为哨兵，让二维前缀和的下标从 1 开始
+  for (int i = 0; i < n; i ++ ) {
+    int x, y;
+    cin >> x >> y;
+    numbers.push_back(x);
+    numbers.push_back(y);
+    points[i] = {x, y};
   }
-  for (int i=1; i<=10000; i++) {
-    if (xx[i]) x[++tx] = i; // x[j]表示离散化后对应原始三叶草的横坐标
-    xx[i] = tx; // 此时xx[i]表示原始三叶草横坐标i所对应的离散化后的横坐标
-    if (yy[i]) y[++ty] = i;
-    yy[i] = ty;
+  sort(numbers.begin(), numbers.end()); // 排序 + 去重
+  numbers.erase(unique(numbers.begin(), numbers.end()), numbers.end());
+
+  // 构建频数矩阵：把原始点映射到离散化后的网格中
+  for (int i = 0; i < n; i ++ ) {
+    int x = find(points[i].first), y = find(points[i].second);
+    sum[x][y] ++ ;
   }
-  for (int i=1; i<=n; i++) s[xx[p[i].x]][yy[p[i].y]]++;
-  for (int i=1; i<=tx; i++) // 完成离散化后的前缀数组
-    for (int j=1; j<=ty; j++)
-      s[i][j] += s[i-1][j] + s[i][j-1] - s[i-1][j-1];
+  // 二维前缀和：sum[i][j] 表示左上角 (1,1) 到右下角 (i,j) 这个矩形区域内的总点数
+  for (int i = 1; i < numbers.size(); i ++ )
+    for (int j = 1; j < numbers.size(); j ++ )
+      sum[i][j] += sum[i - 1][j] + sum[i][j - 1] - sum[i - 1][j - 1];
+
+  // 转二分判定：二分正方形的边长 len
   int l = 1, r = 10000;
   while (l < r) {
-    int mid = (l + r) >> 1;
-    if (pd(mid)) r = mid; // 判断边长为mid的正方形围栏是否符合其中三叶草>=c
+    int mid = l + r >> 1;
+    if (check(mid)) r = mid;
     else l = mid + 1;
   }
   cout << l << endl;

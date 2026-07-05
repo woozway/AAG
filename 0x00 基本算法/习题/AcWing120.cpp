@@ -1,42 +1,44 @@
-#include <iostream>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 200006, INF = 0x3f3f3f3f;
-int n, t, s[N], e[N], d[N];
-// b-a后以d为间隔，间隔数+1即位点数
-int f(int a, int b, int d) {
-  return (b >= a) ? ((b - a)/d + 1) : 0;
-}
-// 求有多少个数<=r，之后可根据奇偶性二分
-int le(int r) {
-  int ans = 0;
-  for (int i=1; i<=n; i++) ans += f(s[i], min(e[i], r), d[i]);
-  return ans;
-}
+typedef long long LL;
+const int N = 2e5 + 10;
+struct Seq {
+  int s, e, d; // 定义等差数列结构体：s 为起点，e 为终点，d 为公差
+} seqs[N];
+int n;
 
-void Defense() {
-  cin >> n;
-  int mins = INF, maxe = 0;
-  for (int i=1; i<=n; i++) {
-    cin >> s[i] >> e[i] >> d[i];
-    mins = min(mins, s[i]);
-    maxe = max(maxe, e[i]);
-  }
-  if (le(maxe) % 2 == 0) {
-    cout << "There's no weakness." << endl;
-    return;
-  }
-  int l = mins, r = maxe;
-  while (l < r) {
-    int mid = (l + r) >> 1;
-    if (le(mid) % 2) r = mid;
-    else l = mid + 1;
-  }
-  cout << l << " " << le(l) - le(l-1) << endl;
+LL get_sum(int x) { // 计算在所有数列中，小于等于 x 的数字总共有多少个
+  LL res = 0;
+  for (int i = 0; i < n; i ++ )
+    if (seqs[i].s <= x) // 只有当数列的起点 s <= x 时，这个数列才可能包含 <= x 的数字
+      res += (min(seqs[i].e, x) - seqs[i].s) / seqs[i].d + 1;
+  return res;
 }
 
 int main() {
-  cin >> t;
-  while (t--) Defense();
+  int T;
+  scanf("%d", &T);
+
+  while (T -- ) {
+    int l = 0, r = 0;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i ++ ) {
+      int s, e, d;
+      scanf("%d%d%d", &s, &e, &d);
+      seqs[i] = {s, e, d};
+      r = max(r, e);
+    }
+
+    while (l < r) {
+      int mid = (LL)l + r >> 1;
+      if (get_sum(mid) & 1) r = mid;
+      else l = mid + 1;
+    }
+    // 二分结束后 l == r，此时 r 就是那个唯一可能出现奇数次的数字
+    auto sum = get_sum(r) - get_sum(r - 1);
+    if (sum % 2) printf("%d %lld\n", r, sum);
+    else puts("There's no weakness.");
+  }
+
   return 0;
 }

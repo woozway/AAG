@@ -1,65 +1,72 @@
-#include <iostream>
-#include <cmath>
-#include <iomanip>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 100006;
-const double INF = 0x3f3f3f3f;
-struct P {
+const int N = 2e5 + 10, INF = 1e10;
+struct Point {
   double x, y;
-  bool z; // 区分两波数字
-  bool operator < (const P w) const {
-    return x < w.x;
+  bool type; // 标记点属于集合 A(0) 还是集合 B(1)
+  bool operator< (const Point &W) const {
+    return x < W.x;
   }
-} p[N*2], tmp[N*2];
-int n, t;
+} points[N], temp[N];
 
-double dist(P a, P b) {
-  if (a.z == b.z) return INF;
-  return sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y));
+double dist(Point &a, Point &b) {
+  if (a.type == b.type) return INF;
+  double dx = a.x - b.x, dy = a.y - b.y;
+  return sqrt(dx * dx + dy * dy);
 }
-// 分治法计算左半右半，取最小ans；然后依此计算左右各一个点的情况
-double s(int l, int r) {
-  if (l == r) return INF;
-  if (l + 1 == r) return dist(p[l], p[r]);
-  int mid = (l + r) >> 1;
-  double ans = min(s(l, mid), s(mid+1, r));
 
-  // 归并排序，并在过程中将[l,r]中的点按照y从小到大排列
-  int i = l, j = mid+1;
-  for (int k=l; k<=r; k++)
-    if (j>r || (i<=mid && p[i].y<=p[j].y)) tmp[k] = p[i++];
-    else tmp[k] = p[j++];
-  for (int k=l; k<=r; k++) p[k] = tmp[k];
+double dfs(int l, int r) { // 分治法核心函数：在区间 [l, r] 内找不同集合的最短距离
+  if (l >= r) return INF;
 
-  // 在[p[mid].x-ans, p[mid].x+ans]的左半找最多6个点，右半找最多6个点
+  int mid = l + r >> 1;
+  double mid_x = points[mid].x;
+  // 递归求出左半部分的最小距离，和右半部分的最小距离，取两者中的较小值 res
+  double res = min(dfs(l, mid), dfs(mid + 1, r));
+  // Y 坐标归并排序，用双指针 i 和 j，将这两个有序序列合并成一个按 Y 坐标排序的大序列
+  {
+    int k = 0, i = l, j = mid + 1;
+    while (i <= mid && j <= r)
+      if (points[i].y < points[j].y) temp[k ++ ] = points[i ++ ];
+      else temp[k ++ ] = points[j ++ ];
+    while (i <= mid) temp[k ++ ] = points[i ++ ];
+    while (j <= r) temp[k ++ ] = points[j ++ ];
+    for (i = 0, j = l; i < k; i ++ , j ++ ) points[j] = temp[i];
+  }
+  // 处理跨越中轴线的点对：只有 X 坐标距离中轴线在 res 范围内的点，
+  // 才有可能构成更短的距离，将可能的“候选点”筛选到 temp 数组中
   int k = 0;
-  for (int i=mid; i>=l && k<6; i--)
-    if (p[i].x >= p[mid].x-ans) tmp[k++] = p[i];
-  for (int i=mid+1; i<=r && k<12; i++)
-    if (p[i].x >= p[mid].x-ans) tmp[k++] = p[i];
-  for (int i=1; i<k; i++)
-    for (int j=i-1; j>=0; j--)
-      ans = min(ans, dist(tmp[i], tmp[j]));
-  return ans;
-}
+  for (int i = l; i <= r; i ++ )
+    if (points[i].x >= mid_x - res && points[i].x <= mid_x + res)
+      temp[k ++ ] = points[i];
 
-void Raid() {
-  cin >> n;
-  for (int i=1; i<=n; i++) {
-    cin >> p[i].x >> p[i].y;
-    p[i].z = 0;
-  }
-  for (int i=1; i<=n; i++) {
-    cin >> p[i+n].x >> p[i+n].y;
-    p[i+n].z = 1;
-  }
-  sort(p+1, p+2*n+1); // 按照x坐标从小到达排列
-  cout << fixed << setprecision(3) << s(1, 2*n) << endl;
+  // 由于 temp 数组已按 Y 坐标排好序，第二个for循环中最多只往回找 6~7 个点，O(1)
+  for (int i = 0; i < k; i ++ )
+    for (int j = i - 1; j >= 0 && temp[i].y - temp[j].y < res; j -- )
+      res = min(res, dist(temp[i], temp[j]));
+
+  return res;
 }
 
 int main() {
-  cin >> t;
-  while (t--) Raid();
+  int T, n;
+  cin >> T;
+
+  while (T -- ) {
+    scanf("%d", &n);
+    for (int i = 0; i < n; i ++ ) {
+      scanf("%lf%lf", &points[i].x, &points[i].y);
+      points[i].type = 0;
+    }
+    for (int i = n; i < 2 * n; i ++ ) {
+      scanf("%lf%lf", &points[i].x, &points[i].y);
+      points[i].type = 1;
+    }
+    // 例如所有点都在同一条直线上，打乱顺序可以有效防止快速排序 / 分治退化
+    random_shuffle(points, points + n * 2);
+    // 首次全局排序：按照 X 坐标从小到大排序，为后续的按 X 坐标分治做准备
+    sort(points, points + n * 2);
+    printf("%.3lf\n", dfs(0, n * 2 - 1));
+  }
+
   return 0;
 }
