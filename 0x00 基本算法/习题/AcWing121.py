@@ -33,7 +33,7 @@ def main():
         
     for i in range(1, m):
         for j in range(1, m):
-            sum_mat[i][j] += sum_mat[i-1][j] + sum_mat[i][j-1] - sum_mat[i-1][j-1]
+            sum_mat[i][j] += sum_mat[i - 1][j] + sum_mat[i][j - 1] - sum_mat[i - 1][j - 1]
             
     def check(length):
         x1 = 1
@@ -44,7 +44,7 @@ def main():
             for y2 in range(1, m):
                 while numbers[y2] - numbers[y1] + 1 > length:
                     y1 += 1
-                val = sum_mat[x2][y2] - sum_mat[x1-1][y2] - sum_mat[x2][y1-1] + sum_mat[x1-1][y1-1]
+                val = sum_mat[x2][y2] - sum_mat[x1 - 1][y2] - sum_mat[x2][y1 - 1] + sum_mat[x1 - 1][y1 - 1]
                 if val >= C:
                     return True
         return False

@@ -7,10 +7,10 @@ def main():
         return
     
     idx = 0
-    T_cases = int(input_data[idx])
+    T = int(input_data[idx])
     idx += 1
     
-    for _ in range(T_cases):
+    for _ in range(T):
         m = int(input_data[idx])
         n = int(input_data[idx + 1])
         idx += 2
@@ -19,8 +19,8 @@ def main():
         min_heap = []
         
         print(f"{m} {(n + 1) // 2}")
-        
         cnt = 0
+        
         for i in range(n):
             t = int(input_data[idx])
             idx += 1
@@ -34,8 +34,9 @@ def main():
                 heapq.heappush(max_heap, -a)
             
             if len(max_heap) > len(min_heap) + 1:
-                heapq.heappush(min_heap, -heapq.heappop(max_heap))
-            
+                val = -heapq.heappop(max_heap)
+                heapq.heappush(min_heap, val)
+                
             if i % 2 == 0:
                 print(f"{-max_heap[0]}", end=" ")
                 cnt += 1
