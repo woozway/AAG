@@ -5,26 +5,22 @@ def main():
     input_data = sys.stdin.read().split()
     if not input_data:
         return
+        
+    iterator = iter(int(x) for x in input_data)
+    num_tests = next(iterator)
     
-    idx = 0
-    T = int(input_data[idx])
-    idx += 1
-    
-    for _ in range(T):
-        m = int(input_data[idx])
-        n = int(input_data[idx + 1])
-        idx += 2
+    for _ in range(num_tests):
+        m = next(iterator)
+        n = next(iterator)
+        
+        print(f"{m} {(n + 1) // 2}")
         
         max_heap = []
         min_heap = []
-        
-        print(f"{m} {(n + 1) // 2}")
-        cnt = 0
+        res = []
         
         for i in range(n):
-            t = int(input_data[idx])
-            idx += 1
-            
+            t = next(iterator)
             heapq.heappush(max_heap, -t)
             
             if min_heap and min_heap[0] < -max_heap[0]:
@@ -32,19 +28,15 @@ def main():
                 b = -heapq.heappop(max_heap)
                 heapq.heappush(min_heap, b)
                 heapq.heappush(max_heap, -a)
-            
+                
             if len(max_heap) > len(min_heap) + 1:
-                val = -heapq.heappop(max_heap)
-                heapq.heappush(min_heap, val)
+                heapq.heappush(min_heap, -heapq.heappop(max_heap))
                 
             if i % 2 == 0:
-                print(f"{-max_heap[0]}", end=" ")
-                cnt += 1
-                if cnt % 10 == 0:
-                    print()
-        
-        if cnt % 10 != 0:
-            print()
+                res.append(str(-max_heap[0]))
+                
+        for i in range(0, len(res), 10):
+            print(' '.join(res[i:i + 10]))
 
 if __name__ == '__main__':
     main()

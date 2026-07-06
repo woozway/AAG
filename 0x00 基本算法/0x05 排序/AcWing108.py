@@ -1,58 +1,52 @@
 import sys
 
-def merge_sort(a, tmp, l, r):
-    if l >= r:
-        return 0
+def count_inversions(arr):
+    if len(arr) <= 1:
+        return arr, 0
+        
+    mid = len(arr) // 2
+    left, inv_left = count_inversions(arr[:mid])
+    right, inv_right = count_inversions(arr[mid:])
     
-    mid = (l + r) // 2
-    res = merge_sort(a, tmp, l, mid) + merge_sort(a, tmp, mid + 1, r)
+    merged = []
+    inv_count = inv_left + inv_right
+    i = j = 0
     
-    i, j = l, mid + 1
-    for k in range(l, r + 1):
-        if j > r or (i <= mid and a[i] <= a[j]):
-            tmp[k] = a[i]
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            merged.append(left[i])
             i += 1
         else:
-            tmp[k] = a[j]
+            merged.append(right[j])
+            inv_count += len(left) - i
             j += 1
-            res += (mid - i + 1)
             
-    for k in range(l, r + 1):
-        a[k] = tmp[k]
-        
-    return res
+    merged.extend(left[i:])
+    merged.extend(right[j:])
+    return merged, inv_count
 
 def main():
     input_data = sys.stdin.read().split()
     if not input_data:
         return
+        
+    iterator = iter(int(x) for x in input_data)
     
-    idx = 0
-    while idx < len(input_data):
-        n = int(input_data[idx])
-        idx += 1
+    while True:
+        try:
+            n = next(iterator)
+        except StopIteration:
+            break
+            
+        grid_size = n * n
         
-        a1 = []
-        for i in range(n * n):
-            x = int(input_data[idx])
-            idx += 1
-            if x != 0:
-                a1.append(x)
+        a1 = [x for x in (next(iterator) for _ in range(grid_size)) if x != 0]
+        _, res1 = count_inversions(a1)
         
-        tmp1 = [0] * len(a1)
-        res1 = merge_sort(a1, tmp1, 0, len(a1) - 1)
+        a2 = [x for x in (next(iterator) for _ in range(grid_size)) if x != 0]
+        _, res2 = count_inversions(a2)
         
-        a2 = []
-        for i in range(n * n):
-            x = int(input_data[idx])
-            idx += 1
-            if x != 0:
-                a2.append(x)
-                
-        tmp2 = [0] * len(a2)
-        res2 = merge_sort(a2, tmp2, 0, len(a2) - 1)
-        
-        if (res1 % 2) == (res2 % 2):
+        if (res1 & 1) == (res2 & 1):
             print("TAK")
         else:
             print("NIE")

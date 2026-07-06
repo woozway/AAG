@@ -15,11 +15,11 @@ class Solution:
                     l = mid
                 else:
                     r = mid - 1
-            
+                    
             res.append(i)
             for j in range(len(res) - 2, r, -1):
                 res[j], res[j + 1] = res[j + 1], res[j]
-            
+                
             if not compare(res[r], i):
                 res[r], res[r + 1] = res[r + 1], res[r]
                 

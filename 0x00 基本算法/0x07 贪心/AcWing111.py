@@ -5,37 +5,34 @@ def main():
     input_data = sys.stdin.read().split()
     if not input_data:
         return
+        
+    iterator = iter(int(x) for x in input_data)
+    n = next(iterator)
     
-    n = int(input_data[0])
     cows = []
-    idx = 1
     for i in range(n):
-        start = int(input_data[idx])
-        end = int(input_data[idx + 1])
+        start = next(iterator)
+        end = next(iterator)
         cows.append(((start, end), i))
-        idx += 2
         
     cows.sort()
     
-    id_arr = [0] * n
     heap = []
+    stall_ids = [0] * n
     
-    for i in range(n):
-        start, end = cows[i][0]
-        original_idx = cows[i][1]
-        
-        if not heap or heap[0][0] >= start:
-            stall_idx = len(heap)
-            id_arr[original_idx] = stall_idx
-            heapq.heappush(heap, (end, stall_idx))
+    for (start, end), original_idx in cows:
+        if heap and heap[0][0] < start:
+            _, stall_num = heapq.heappop(heap)
+            stall_ids[original_idx] = stall_num
+            heapq.heappush(heap, (end, stall_num))
         else:
-            stall_end, stall_idx = heapq.heappop(heap)
-            id_arr[original_idx] = stall_idx
-            heapq.heappush(heap, (end, stall_idx))
+            stall_num = len(heap) + 1
+            stall_ids[original_idx] = stall_num
+            heapq.heappush(heap, (end, stall_num))
             
     print(len(heap))
     for i in range(n):
-        print(id_arr[i] + 1)
+        print(stall_ids[i])
 
 if __name__ == '__main__':
     main()

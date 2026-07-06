@@ -1,55 +1,56 @@
 import sys
 
 class Node:
+    __slots__ = ['p', 's', 'v', 'avg']
+    
     def __init__(self, v):
         self.p = 0
         self.s = 1
         self.v = v
         self.avg = float(v)
 
-def find(n, root, nodes):
-    avg = 0.0
-    res = -1
-    for i in range(1, n + 1):
-        if i != root and nodes[i].avg > avg:
-            avg = nodes[i].avg
-            res = i
-    return res
-
 def main():
     input_data = sys.stdin.read().split()
     if not input_data:
         return
+        
+    iterator = iter(int(x) for x in input_data)
     
-    n = int(input_data[0])
-    root = int(input_data[1])
-    
-    nodes = [Node(0) for _ in range(n + 1)]
+    try:
+        n = next(iterator)
+        root = next(iterator)
+    except StopIteration:
+        return
+        
+    nodes = [None]
     ans = 0
     
-    idx = 2
-    for i in range(1, n + 1):
-        v = int(input_data[idx])
-        idx += 1
-        nodes[i] = Node(v)
+    for _ in range(n):
+        v = next(iterator)
+        nodes.append(Node(v))
         ans += v
         
-    for i in range(n - 1):
-        a = int(input_data[idx])
-        b = int(input_data[idx + 1])
-        idx += 2
+    for _ in range(n - 1):
+        a = next(iterator)
+        b = next(iterator)
         nodes[b].p = a
         
-    for i in range(n - 1):
-        p = find(n, root, nodes)
-        father = nodes[p].p
+    for _ in range(n - 1):
+        max_avg = -1.0
+        p = -1
         
+        for i in range(1, n + 1):
+            if i != root and nodes[i].avg > max_avg:
+                max_avg = nodes[i].avg
+                p = i
+                
+        father = nodes[p].p
         ans += nodes[p].v * nodes[father].s
         nodes[p].avg = -1.0
         
-        for j in range(1, n + 1):
-            if nodes[j].p == p:
-                nodes[j].p = father
+        for i in range(1, n + 1):
+            if nodes[i].p == p:
+                nodes[i].p = father
                 
         nodes[father].v += nodes[p].v
         nodes[father].s += nodes[p].s

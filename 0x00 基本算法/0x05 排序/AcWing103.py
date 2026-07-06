@@ -1,48 +1,31 @@
 import sys
-import bisect
+from collections import Counter
 
 def main():
     input_data = sys.stdin.read().split()
     if not input_data:
         return
-
-    n = int(input_data[0])
-    add = [int(x) for x in input_data[1 : n + 1]]
-    
-    idx = n + 1
-    m = int(input_data[idx])
-    idx += 1
-    
-    b = [int(x) for x in input_data[idx : idx + m]]
-    idx += m
-    c = [int(x) for x in input_data[idx : idx + m]]
-    
-    all_vals = sorted(list(set(add + b + c)))
-    
-    def find(x):
-        return bisect.bisect_left(all_vals, x)
         
-    a = [0] * len(all_vals)
-    for x in add:
-        a[find(x)] += 1
-        
-    res = 1
-    like = 0
-    sub = 0
+    iterator = iter(int(x) for x in input_data)
+    
+    n = next(iterator)
+    counts = Counter(next(iterator) for _ in range(n))
+    
+    m = next(iterator)
+    b = [next(iterator) for _ in range(m)]
+    c = [next(iterator) for _ in range(m)]
+    
+    best_movie = 1
+    max_audio = -1
+    max_sub = -1
     
     for i in range(m):
-        L = a[find(b[i])]
-        l = a[find(c[i])]
-        
-        if like < L:
-            like = L
-            sub = l
-            res = i + 1
-        elif like == L and sub < l:
-            sub = l
-            res = i + 1
+        audio, sub = counts[b[i]], counts[c[i]]
+        if (audio, sub) > (max_audio, max_sub):
+            max_audio, max_sub = audio, sub
+            best_movie = i + 1
             
-    print(res)
+    print(best_movie)
 
 if __name__ == '__main__':
     main()

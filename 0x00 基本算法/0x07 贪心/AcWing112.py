@@ -5,38 +5,39 @@ def main():
     input_data = sys.stdin.read().split()
     if not input_data:
         return
-    
-    n = int(input_data[0])
-    d = int(input_data[1])
-    
-    seg = []
-    success = True
-    
-    idx = 2
-    for i in range(n):
-        x = int(input_data[idx])
-        y = int(input_data[idx + 1])
-        idx += 2
         
+    iterator = iter(int(x) for x in input_data)
+    try:
+        n = next(iterator)
+        d = next(iterator)
+    except StopIteration:
+        return
+        
+    segments = []
+    d_sq = d * d
+    
+    for _ in range(n):
+        x = next(iterator)
+        y = next(iterator)
         if y > d:
-            success = False
-            break
+            print("-1")
+            return
         
-        len_val = math.sqrt(d * d - y * y)
-        seg.append((x + len_val, x - len_val))
+        half_len = math.sqrt(d_sq - y * y)
+        segments.append((x + half_len, x - half_len))
+        
+    segments.sort()
     
-    if not success:
-        print("-1")
-    else:
-        seg.sort()
-        res = 0
-        last = -1e10
-        
-        for r, l in seg:
-            if l > last + 1e-6:
-                res += 1
-                last = r
-        print(res)
+    res = 0
+    last = -float('inf')
+    eps = 1e-6
+    
+    for right, left in segments:
+        if left > last + eps:
+            res += 1
+            last = right
+            
+    print(res)
 
 if __name__ == '__main__':
     main()
