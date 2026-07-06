@@ -4,34 +4,32 @@ def main():
     input_data = sys.stdin.read().split()
     if not input_data:
         return
+        
+    iterator = iter(int(x) for x in input_data)
+    cnt = next(iterator)
+    R = min(5001, next(iterator))
     
-    cnt = int(input_data[0])
-    r = int(input_data[1])
+    size = 5002
+    s = [[0] * size for _ in range(size)]
     
-    limit = 5001
-    r = min(limit, r)
-    
-    s = [[0] * (limit + 1) for _ in range(limit + 1)]
-    
-    idx = 2
     for _ in range(cnt):
-        x = int(input_data[idx])
-        y = int(input_data[idx + 1])
-        w = int(input_data[idx + 2])
-        idx += 3
-        x += 1
-        y += 1
-        if x <= limit and y <= limit:
-            s[x][y] += w
-            
-    for i in range(1, limit + 1):
-        for j in range(1, limit + 1):
-            s[i][j] += s[i - 1][j] + s[i][j - 1] - s[i - 1][j - 1]
+        x = next(iterator) + 1
+        y = next(iterator) + 1
+        w = next(iterator)
+        s[x][y] += w
+        
+    for i in range(1, 5002):
+        row = s[i]
+        prev_row = s[i - 1]
+        for j in range(1, 5002):
+            row[j] += prev_row[j] + row[j - 1] - prev_row[j - 1]
             
     res = 0
-    for i in range(r, limit + 1):
-        for j in range(r, limit + 1):
-            val = s[i][j] - s[i - r][j] - s[i][j - r] + s[i - r][j - r]
+    for i in range(R, 5002):
+        row = s[i]
+        prev_row = s[i - R]
+        for j in range(R, 5002):
+            val = row[j] - prev_row[j] - row[j - R] + prev_row[j - R]
             if val > res:
                 res = val
                 
