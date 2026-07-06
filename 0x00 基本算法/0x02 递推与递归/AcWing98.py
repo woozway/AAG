@@ -3,23 +3,20 @@ import math
 
 def calc(n, m):
     if n == 0:
-        return (0, 0)
+        return 0, 0
     
-    len_val = 1 << (n - 1)
+    len_side = 1 << (n - 1)
     cnt = 1 << (2 * (n - 1))
-    
-    pos = calc(n - 1, m % cnt)
-    x, y = pos[0], pos[1]
+    x, y = calc(n - 1, m % cnt)
     z = m // cnt
     
     if z == 0:
-        return (y, x)
-    elif z == 1:
-        return (x, y + len_val)
-    elif z == 2:
-        return (x + len_val, y + len_val)
-    else:
-        return (-y + 2 * len_val - 1, -x + len_val - 1)
+        return y, x
+    if z == 1:
+        return x, y + len_side
+    if z == 2:
+        return x + len_side, y + len_side
+    return 2 * len_side - 1 - y, len_side - 1 - x
 
 def main():
     input_data = sys.stdin.read().split()
@@ -28,24 +25,15 @@ def main():
     
     t = int(input_data[0])
     idx = 1
-    results = []
-    
     for _ in range(t):
-        n = int(input_data[idx])
-        a = int(input_data[idx + 1])
-        b = int(input_data[idx + 2])
+        n, a, b = map(int, input_data[idx:idx + 3])
         idx += 3
         
-        ac = calc(n, a - 1)
-        bc = calc(n, b - 1)
+        ax, ay = calc(n, a - 1)
+        bx, by = calc(n, b - 1)
         
-        dx = ac[0] - bc[0]
-        dy = ac[1] - bc[1]
-        
-        dist = math.sqrt(dx * dx + dy * dy) * 10
-        results.append(str(int(round(dist))))
-        
-    print('\n'.join(results))
+        dist = math.sqrt((ax - bx)**2 + (ay - by)**2) * 10
+        print(f"{round(dist)}")
 
 if __name__ == '__main__':
     main()
