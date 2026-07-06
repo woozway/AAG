@@ -1,39 +1,19 @@
 import sys
 
-def qmi(a, b, p):
-    a %= p
-    res = 1 % p
-    while b > 0:
-        if b & 1:
-            res = (res * a) % p
-        a = (a * a) % p
-        b >>= 1
-    return res
-
 def main():
-    input_data = sys.stdin.read().split()
-    if not input_data:
+    input_data = map(int, sys.stdin.read().split())
+    
+    try:
+        t = next(input_data)
+    except StopIteration:
         return
-    
-    idx = 0
-    t = int(input_data[idx])
-    idx += 1
-    
-    output = []
+        
     for _ in range(t):
-        p = int(input_data[idx])
-        n = int(input_data[idx + 1])
-        idx += 2
+        p = next(input_data)
+        n = next(input_data)
         
-        res = 0
-        for _ in range(n):
-            a = int(input_data[idx])
-            b = int(input_data[idx + 1])
-            idx += 2
-            res = (res + qmi(a, b, p)) % p
-        output.append(str(res))
-        
-    sys.stdout.write('\n'.join(output) + '\n')
+        res = sum(pow(next(input_data), next(input_data), p) for _ in range(n)) % p
+        print(res)
 
 if __name__ == '__main__':
     main()
