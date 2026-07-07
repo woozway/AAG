@@ -1,45 +1,27 @@
 import sys
 
 def main():
-    closed = [[] for _ in range(14)]
-    open_count = [0] * 14
-    
-    input_data = sys.stdin.read().split()
-    if not input_data:
+    tokens = sys.stdin.read().split()
+    if not tokens:
         return
         
-    idx = 0
+    val_map = {str(i): i for i in range(2, 10)}
+    val_map.update({'0': 10, 'A': 1, 'J': 11, 'Q': 12})
+    
+    closed = [[] for _ in range(14)]
     for i in range(1, 14):
         for j in range(4):
-            s = input_data[idx]
-            idx += 1
-            if '2' <= s[0] <= '9':
-                x = int(s[0])
-            elif s[0] == '0':
-                x = 10
-            elif s[0] == 'A':
-                x = 1
-            elif s[0] == 'J':
-                x = 11
-            elif s[0] == 'Q':
-                x = 12
-            else:
-                x = 13
-            closed[i].append(x)
+            ch = tokens[(i - 1) * 4 + j][0]
+            closed[i].append(val_map.get(ch, 13))
             
-    for i in range(4):
-        t = closed[13][i]
+    open_counts = [0] * 14
+    
+    for t in closed[13]:
         while t != 13:
-            open_count[t] += 1
-            r = t
-            t = closed[r].pop()
+            open_counts[t] += 1
+            t = closed[t].pop()
             
-    res = 0
-    for i in range(1, 13):
-        if open_count[i] >= 4:
-            res += 1
-            
-    print(res)
+    print(sum(1 for i in range(1, 13) if open_counts[i] >= 4))
 
 if __name__ == '__main__':
     main()

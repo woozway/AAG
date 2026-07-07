@@ -4,27 +4,22 @@ def main():
     input_data = sys.stdin.read().split()
     if not input_data:
         return
-    
-    n = int(input_data[0])
-    s = [0] * (n + 1)
-    
-    for i in range(1, n + 1):
-        s[i] = int(input_data[i]) + s[i - 1]
         
-    b = s[n] // n
+    n = int(input_data[0])
+    a = [int(x) for x in input_data[1:n + 1]]
+    
+    b = sum(a) // n
     c = [0] * n
     
-    for i in range(1, n):
-        c[i - 1] = i * b - s[i]
-    c[n - 1] = 0
-    
-    c.sort()
-    mid = c[n // 2]
-    
-    res = 0
-    for val in c:
-        res += abs(val - mid)
+    current_sum = 0
+    for i in range(n - 1):
+        current_sum += a[i]
+        c[i] = (i + 1) * b - current_sum
         
+    c.sort()
+    median = c[n // 2]
+    
+    res = sum(abs(x - median) for x in c)
     print(res)
 
 if __name__ == '__main__':

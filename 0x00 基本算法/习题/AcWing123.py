@@ -1,33 +1,23 @@
 import sys
 
-def work(q, n):
+def work(q):
     q.sort()
-    res = 0
-    median = q[n // 2]
-    for val in q:
-        res += abs(val - median)
-    return res
+    mid = q[len(q) // 2]
+    return sum(abs(v - mid) for v in q)
 
 def main():
     input_data = sys.stdin.read().split()
     if not input_data:
         return
-    
+        
     n = int(input_data[0])
-    x = [0] * n
-    y = [0] * n
     
-    idx = 1
-    for i in range(n):
-        x[i] = int(input_data[idx])
-        y[i] = int(input_data[idx + 1])
-        idx += 2
-        
-    x.sort()
-    for i in range(n):
-        x[i] -= i
-        
-    print(work(x, n) + work(y, n))
+    x = [int(input_data[i]) for i in range(1, 2 * n, 2)]
+    y = [int(input_data[i]) for i in range(2, 2 * n + 1, 2)]
+    
+    x = [val - i for i, val in enumerate(sorted(x))]
+    
+    print(work(x) + work(y))
 
 if __name__ == '__main__':
     main()

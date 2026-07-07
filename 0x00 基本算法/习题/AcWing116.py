@@ -1,41 +1,38 @@
 import sys
 
 def main():
-    N = 4
-    change = [[0 for _ in range(N)] for _ in range(N)]
-
-    for i in range(N):
-        for j in range(N):
-            for k in range(N):
-                change[i][j] += (1 << (i * N + k)) + (1 << (k * N + j))
-            change[i][j] -= (1 << (i * N + j))
-
-    state = 0
-    lines = sys.stdin.read().split()
-    for i in range(N):
-        for j in range(N):
-            if lines[i][j] == '+':
-                state += (1 << (i * N + j))
-
-    path = []
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    state = sum(
+        1 << (i * 4 + j)
+        for i in range(4) for j in range(4)
+        if input_data[i][j] == '+'
+    )
     
-    for i in range(1 << 16):
+    masks = [
+        sum(1 << (i * 4 + k) for k in range(4)) | sum(1 << (k * 4 + j) for k in range(4))
+        for i in range(4) for j in range(4)
+    ]
+    
+    best_path = None
+    
+    for i in range(65536):
         now = state
-        temp = []
         for j in range(16):
             if (i >> j) & 1:
-                x = j // 4
-                y = j % 4
-                now ^= change[x][y]
-                temp.append((x, y))
-        
+                now ^= masks[j]
+                
         if now == 0:
-            if not path or len(path) > len(temp):
-                path = temp
-
-    print(len(path))
-    for p in path:
-        print(f"{p[0] + 1} {p[1] + 1}")
+            path = [(j // 4 + 1, j % 4 + 1) for j in range(16) if (i >> j) & 1]
+            if best_path is None or len(path) < len(best_path):
+                best_path = path
+                
+    if best_path is not None:
+        print(len(best_path))
+        for r, c in best_path:
+            print(f"{r} {c}")
 
 if __name__ == '__main__':
     main()

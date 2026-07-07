@@ -1,47 +1,42 @@
 import sys
 
-def get_sum(n, seqs, x):
-    res = 0
-    for i in range(n):
-        s, e, d = seqs[i]
-        if s <= x:
-            res += (min(e, x) - s) // d + 1
-    return res
-
 def main():
     input_data = sys.stdin.read().split()
     if not input_data:
         return
+        
+    iterator = iter(int(x) for x in input_data)
     
-    idx = 0
-    T = int(input_data[idx])
-    idx += 1
-    
+    try:
+        T = next(iterator)
+    except StopIteration:
+        return
+        
     for _ in range(T):
-        n = int(input_data[idx])
-        idx += 1
+        n = next(iterator)
         seqs = []
-        l, r = 0, 0
-        for i in range(n):
-            s = int(input_data[idx])
-            e = int(input_data[idx + 1])
-            d = int(input_data[idx + 2])
-            idx += 3
+        r = 0
+        
+        for _ in range(n):
+            s = next(iterator)
+            e = next(iterator)
+            d = next(iterator)
             seqs.append((s, e, d))
             if e > r:
                 r = e
-        
+                
+        def get_sum(x):
+            return sum((min(e, x) - s) // d + 1 for s, e, d in seqs if s <= x)
+            
+        l = 0
         while l < r:
             mid = (l + r) // 2
-            if get_sum(n, seqs, mid) % 2 != 0:
+            if get_sum(mid) % 2 != 0:
                 r = mid
             else:
                 l = mid + 1
-        
-        sum_r = get_sum(n, seqs, r)
-        sum_r_minus_1 = get_sum(n, seqs, r - 1)
-        count = sum_r - sum_r_minus_1
-        
+                
+        count = get_sum(r) - get_sum(r - 1)
         if count % 2 != 0:
             print(f"{r} {count}")
         else:
