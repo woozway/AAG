@@ -1,44 +1,42 @@
-#include <cstdio>
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 1000006, INF = 0x3f3f3f3f;
-int q, st1[N], st2[N], s[N], f[N]; // s是序列的前缀和，f维护前缀和的最大值
+const int N = 1e6 + 10;
+int stkl[N], stkr[N], topl, topr; // 对顶栈：stkl/stkr 分别存储光标左/后边的元素
+int f[N], sum[N]; // sum[i]: 左栈中前 i 个元素前缀和；f[i]: 左栈中前 i 个元素里，最大的前缀和
 
-void Editor() {
-  int t1 = 0, t2 = 0;
-  while (q--) {
-    char c[2];
-    scanf("%s", c);
-    switch (c[0]) {
-      case 'I':
-        scanf("%d", &st1[++t1]);
-        s[t1] = s[t1-1] + st1[t1];
-        f[t1] = max(f[t1-1], s[t1]);
-        continue;
-      case 'D':
-        if (t1) t1--;
-        continue;
-      case 'L':
-        if (t1) st2[++t2] = st1[t1--];
-        continue;
-      case 'R':
-        if (!t2) continue;
-        st1[++t1] = st2[t2--];
-        s[t1] = s[t1-1] + st1[t1];
-        f[t1] = max(f[t1-1], s[t1]);
-        continue;
-      case 'Q':
-        int k;
-        scanf("%d", &k);
-        printf("%d\n", f[k]);
-    }
-  }
+void add(int x) { // 在光标处（左栈顶）插入一个新元素
+  stkl[ ++ topl] = x;
+  sum[topl] = sum[topl - 1] + x;
+  f[topl] = max(f[topl - 1], sum[topl]);
 }
 
 int main() {
-  s[0] = 0;
-  f[0] = -INF;
-  cin >> q;
-  Editor();
+  int n;
+  scanf("%d", &n);
+
+  f[0] = INT_MIN; // 初始状态没有元素，最大子段和设为极小值（防止全负数时出错）
+  char ops[2]; // 用字符串读取单个字符，可以自动过滤掉空格和换行符
+  while (n -- ) {
+    int x;
+    scanf("%s", ops);
+    if (*ops == 'I') {
+      scanf("%d", &x);
+      add(x);
+    }
+    else if (*ops == 'D') {
+      if (topl) topl -- ;
+    }
+    else if (*ops == 'L') {
+      if (topl) stkr[ ++ topr] = stkl[topl -- ];
+    }
+    else if (*ops == 'R') {
+      // stkr 可以在频繁的 LLLLRRRLLR 时保存光标左右的上下文
+      if (topr) add(stkr[topr -- ]);
+    }
+    else {
+      scanf("%d", &x);
+      printf("%d\n", f[x]);
+    }
+  }
   return 0;
 }
