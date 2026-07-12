@@ -1,29 +1,34 @@
-#include <cstdio>
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 26;
-int n, num = 0, st[N], top = 0, ans[N], t = 0; // ans中是已出栈的，st是还在栈中的
-// 任何状态时只有两种选择：1.下一个数x进栈；2.把当前栈顶的数出栈（如果栈非空）
-void z(int x) {
-  if (x == n+1) {
-    if (++num > 20) exit(0);
-    for (int i=1; i<=t; i++) printf("%d", ans[i]);
-    for (int i=top; i; i--) printf("%d", st[i]);
+int n, remain = 20;
+vector<int> path; // path: 记录当前已经出栈的元素，即最终的出栈序列
+stack<int> stk;
+
+void dfs(int u) { // 参数 u: 表示当前正在等待进栈的数字（1 ~ n）
+  if (!remain) return;
+  if (path.size() == n) {
+    remain -- ;
+    for (auto x : path) cout << x;
     cout << endl;
     return;
   }
-  if (top) {
-    ans[++t] = st[top--];
-    z(x);
-    st[++top] = ans[t--];
+
+  if (stk.size()) { // 为保证输出的出栈序列是字典序最小的，须优先选择“出栈”
+    path.push_back(stk.top());
+    stk.pop();
+    dfs(u); // 此时等待进栈的数字仍然是 u，所以传参还是 u
+    stk.push(path.back()); // 恢复现场（回溯）
+    path.pop_back();
   }
-  st[++top] = x;
-  z(x + 1);
-  --top;
+  if (u <= n) { // 执行进栈操作
+    stk.push(u);
+    dfs(u + 1); // 数字 u 已经进栈，下一个等待进栈的数字变成了 u + 1
+    stk.pop();
+  }
 }
 
 int main() {
   cin >> n;
-  z(1);
+  dfs(1);
   return 0;
 }

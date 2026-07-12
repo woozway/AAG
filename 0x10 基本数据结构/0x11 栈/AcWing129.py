@@ -1,27 +1,38 @@
-N = 26
-n, num, top, t = 0, 0, 0, 0
-st, ans = [0] * N, [0] * N
-
-def z(x):
-    global n, num, top, t
-    if x == n + 1:
-        num += 1
-        if num > 20: exit(0)
-        for i in range(1, t + 1): print(ans[i], end='')
-        for i in range(top, 0, -1): print(st[i], end='')
-        print()
-        return
-    if top:
-        t += 1; ans[t] = st[top]; top -= 1
-        z(x)
-        top += 1; st[top] = ans[t]; t -= 1
-    top += 1; st[top] = x
-    z(x + 1)
-    top -= 1
+import sys
 
 def main():
-    global n
-    n = int(input())
-    z(1)
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    n = int(input_data[0])
     
-main()
+    remain = 20
+    path = []
+    stk = []
+    
+    def dfs(u):
+        nonlocal remain
+        if not remain:
+            return
+            
+        if len(path) == n:
+            remain -= 1
+            print("".join(map(str, path)))
+            return
+            
+        if stk:
+            val = stk.pop()
+            path.append(val)
+            dfs(u)
+            stk.append(path.pop())
+            
+        if u <= n:
+            stk.append(u)
+            dfs(u + 1)
+            stk.pop()
+            
+    dfs(1)
+
+if __name__ == '__main__':
+    main()
