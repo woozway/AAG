@@ -1,48 +1,50 @@
-# from math import factorial
+import sys
 
-# def comb(n, k):
-#     return factorial(n) // (factorial(k)*factorial(n-k))
-
-# def main():
-#     n = int(input())
-#     print(comb(2*n, n)//(n+1))
-    
-# main()
-
-N = 60005
-n, tot, pows, p, v = 0, 0, [0] * (2 * N), [0] * (2 * N), [0] * (2 * N)
-
-def fac(n, p):
-    cnt = 0
+def get_pow(n, p):
+    s = 0
     while n:
-        cnt += n // p
         n //= p
-    return cnt
-    
-def gj(a, b):
-    c = 0
-    for i in range(len(a)):
-        a[i] = a[i] * b + c
-        c = a[i] // 100000000
-        a[i] %= 100000000
-    while c:
-        a.append(c % 100000000)
-        c //= 100000000
+        s += n
+    return s
 
 def main():
-    global n, tot, pows, p, v
-    n = int(input())
-    for i in range(2, 2 * n + 1):
-        if not v[i]:
-            p[tot] = i; tot += 1
-            for j in range(i * 2, 2 * n + 1, i): v[j] = 1
-    for i in range(tot):
-        pows[p[i]] = fac(n * 2, p[i]) - fac(n, p[i]) - fac(n + 1, p[i])
-    ans = [1]
-    for i in range(tot):
-        for j in range(pows[p[i]]):
-            gj(ans, p[i])
-    print(ans[-1], end='')
-    for i in range(len(ans) - 2, -1, -1): print("{:08d}".format(ans[i]), end='')
+    if hasattr(sys, 'set_int_max_str_digits'):
+        sys.set_int_max_str_digits(1000000)
+        
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    n = int(input_data[0])
+    limit = 2 * n
     
-main()
+    st = [False] * (limit + 1)
+    primes = []
+    
+    for i in range(2, limit + 1):
+        if not st[i]:
+            primes.append(i)
+            for j in range(i * i, limit + 1, i):
+                st[j] = True
+                
+    q = [0] * (limit + 1)
+    for p in primes:
+        q[p] = get_pow(limit, p) - get_pow(n, p) * 2
+        
+    k = n + 1
+    for p in primes:
+        if p > k:
+            break
+        while k % p == 0:
+            k //= p
+            q[p] -= 1
+            
+    res = 1
+    for p in primes:
+        if q[p] > 0:
+            res *= pow(p, q[p])
+            
+    print(res)
+
+if __name__ == '__main__':
+    main()
