@@ -1,28 +1,44 @@
-N = 100006
-n, p, ans, a, s, w, rest = 0, 0, 0, [0] * N, [0] * N, [0] * N, []
+import sys
 
-def Largest():
-    global n, p, ans, a, s, w, rest
-    a[1 : n + 1] = rest
-    a[n + 1] = p = 0
-    ans = 0
-    for i in range(1, n + 2):
-        if a[i] > s[p]:
-            p += 1; s[p] = a[i]; w[p] = 1
-        else:
-            width = 0
-            while s[p] > a[i]:
-                width += w[p]
-                ans = max(ans, width * s[p])
-                p -= 1
-            p += 1; s[p] = a[i]; w[p] = width + 1
-    print(ans)
-  
 def main():
-    global n, p, ans, a, s, w, rest
-    while True:
-        n, *rest = [int(x) for x in input().split()]
-        if n == 0: break
-        Largest()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
         
-main()
+    idx = 0
+    out = []
+    
+    while idx < len(input_data):
+        n = int(input_data[idx])
+        if n == 0:
+            break
+        idx += 1
+        
+        h = [-1] + [int(x) for x in input_data[idx : idx + n]] + [-1]
+        idx += n
+        
+        l = [0] * (n + 2)
+        r = [0] * (n + 2)
+        
+        q = [0]
+        for i in range(1, n + 1):
+            while h[i] <= h[q[-1]]:
+                q.pop()
+            l[i] = q[-1]
+            q.append(i)
+            
+        q = [n + 1]
+        for i in range(n, 0, -1):
+            while h[i] <= h[q[-1]]:
+                q.pop()
+            r[i] = q[-1]
+            q.append(i)
+            
+        res = max(h[i] * (r[i] - l[i] - 1) for i in range(1, n + 1))
+        out.append(str(res))
+        
+    if out:
+        print('\n'.join(out))
+
+if __name__ == '__main__':
+    main()
