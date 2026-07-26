@@ -1,48 +1,42 @@
-#include <cstdio>
-#include <vector>
-#include <iostream>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 200006, INF = 0x3f3f3f3f;
-pair<int, int> a[N]; // 存原数组（数值，下标）
+typedef pair<int, int> PII;
+const int N = 2e5 + 10;
 int n;
-vector<int> p[N];
+PII a[N]; // a[i] 存储（元素的值，该元素在原数组中的下标）
 
+// 将按值排好序的元素，根据其原始下标，划分为最少数量的“V型（先降后升）”段落
 int main() {
   cin >> n;
-  for (int i=1; i<=n; i++) {
-    scanf("%d", &a[i].first);
+  for (int i = 0; i < n; i ++ ) {
+    cin >> a[i].first;
     a[i].second = i;
   }
-  sort(a+1, a+n+1); // 这里c++顺便把第二键（下标）也排序了
-  // 将数值相同的一段摘出放在p[t]中：记录每一段最大&最小下标
-  int t = 0;
-  for (int i=1; i<=n; i++) {
-    p[++t].push_back(a[i].second);
-    while (a[i].first == a[i+1].first)
-      p[t].push_back(a[++i].second);
-  }
-  // 根据上一段的趋势（向上/向下）来计算当前数值相同一段的衔接方向
-  bool flag = 0; // 0: 上一段趋势向下，1：...向上
-  int num = INF, ans = 1; // num表示上一段的最后一个数
-  for (int i=1; i<=t; i++) {
-    int s = p[i].size(); // maxp=p[i][s-1], minp=p[i][0]
-    if (flag) {
-      if (num < p[i][0]) num = p[i][s-1];
-      else {
-        ++ans; // 完成一次单谷的切分，答案++
-        flag = 0;
-        num = p[i][0];
-      }
+  sort(a, a + n); // 值相同的元素不仅排在一起，而且它们的原始下标天然是递增的
+  int res = 1;
+  // last 记录上一个合法元素的原始下标。初始设为 n+1 (无穷大)，方便开启第一次递减
+  // dir 记录当前的延伸方向：-1 表示原下标递减阶段，1 表示原下标递增阶段
+  for (int i = 0, last = n + 1, dir = -1; i < n; ) {
+    int j = i; // 将所有值相同的元素作为一个整体批次来处理（因为值相同元素的相对顺序无所谓）
+    while (j < n && a[j].first == a[i].first) j ++ ;
+    // minx 是这批相同值中，原下标最小的；maxx 是原下标最大的
+    int minx = a[i].second, maxx = a[j - 1].second;
+    
+    if (dir == -1) {
+      if (last > maxx) last = minx;
+      else dir = 1, last = maxx;
     }
     else {
-      if (num > p[i][s-1]) num = p[i][0];
+      if (last < minx) last = maxx;
       else {
-        flag = 1;
-        num = p[i][s-1];
+        res ++ ;
+        last = minx;
+        dir = -1;
       }
     }
+    i = j; // 跳过这批处理完的相同值，处理下一批
   }
-  cout << ans << endl;
+
+  cout << res << endl;
   return 0;
 }

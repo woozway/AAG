@@ -1,33 +1,45 @@
-from math import inf
-N = 200006
-a = [[0] * 2 for _ in range(N)]
-p = [[] for _ in range(N)]
+import sys
 
 def main():
-    n = int(input())
-    for i in range(1, n + 1):
-        a[i] = int(input()), i
-    a[1 : n + 1] = sorted(a[1 : n + 1])
-    t, i = 0, 1
-    while i <= n:
-        t += 1; p[t].append(a[i][1])
-        while a[i][0] == a[i + 1][0]:
-            i += 1; p[t].append(a[i][1])
-        i += 1
-    flag, num, ans = 0, inf, 1
-    for i in range(1, t + 1):
-        s = len(p[i])
-        if flag:
-            if num < p[i][0]: num = p[i][s - 1]
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    n = int(input_data[0])
+    a = [(int(val), i) for i, val in enumerate(input_data[1:n + 1])]
+    
+    a.sort()
+    
+    res = 1
+    last = n + 1
+    direction = -1
+    i = 0
+    
+    while i < n:
+        j = i
+        while j < n and a[j][0] == a[i][0]:
+            j += 1
+            
+        minx = a[i][1]
+        maxx = a[j - 1][1]
+        
+        if direction == -1:
+            if last > maxx:
+                last = minx
             else:
-                ans += 1
-                flag = 0
-                num = p[i][0]
+                direction = 1
+                last = maxx
         else:
-            if num > p[i][s - 1]: num = p[i][0]
+            if last < minx:
+                last = maxx
             else:
-                flag = 1
-                num = p[i][s - 1]
-    print(ans)
+                res += 1
+                last = minx
+                direction = -1
+                
+        i = j
+        
+    print(res)
 
-main()
+if __name__ == '__main__':
+    main()
