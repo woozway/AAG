@@ -1,35 +1,52 @@
+import sys
 from collections import deque
 
-N, T = 1000000, 1006
-t, f, _id, q = 0, [0] * N, 0, [0] * T
-
-def Team_Queue():
-    global t, f, _id, q
-    q[0] = deque()
-    for i in range(1, t + 1):
-        _, *rest = [int(x) for x in input().split()]
-        for x in rest: f[x] = i
-        q[i] = deque()
-    _id += 1
-    print("Scenario #%d" %_id)
-    while True:
-        s, *rest = input().split()
-        if s[0] == 'S': break
-        if s[0] == 'E':
-            x = int(rest[0])
-            if not q[f[x]]: q[0].append(f[x])
-            q[f[x]].append(x)
-        else:
-            x = q[0][0]
-            print(q[x].popleft())
-            if not q[x]: q[0].popleft()
-    print()
-    
 def main():
-    global t, f, _id, q
-    while True:
-        t = int(input())
-        if t == 0: break
-        Team_Queue()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
         
-main()
+    iterator = iter(input_data)
+    scenario = 1
+    
+    while True:
+        try:
+            n = int(next(iterator))
+        except StopIteration:
+            break
+            
+        if n == 0:
+            break
+            
+        print(f"Scenario #{scenario}")
+        scenario += 1
+        
+        team_id = {}
+        for i in range(n):
+            cnt = int(next(iterator))
+            for _ in range(cnt):
+                team_id[next(iterator)] = i
+                
+        team_queue = deque()
+        person_queues = [deque() for _ in range(n)]
+        
+        while True:
+            cmd = next(iterator)
+            if cmd == "STOP":
+                break
+            elif cmd == "ENQUEUE":
+                x = next(iterator)
+                tid = team_id[x]
+                if not person_queues[tid]:
+                    team_queue.append(tid)
+                person_queues[tid].append(x)
+            else:
+                tid = team_queue[0]
+                print(person_queues[tid].popleft())
+                if not person_queues[tid]:
+                    team_queue.popleft()
+                    
+        print()
+
+if __name__ == '__main__':
+    main()

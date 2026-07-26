@@ -1,41 +1,43 @@
-#include <queue>
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 1000000, T = 1006;
-int t, f[N], id = 0; // f[x]记录x是属于哪个组
-char s[10];
-queue<int> q[T];
-
-void Team_Queue() {
-  q[0] = queue<int>();
-  for (int i=1; i<=t; i++) {
-    int n;
-    cin >> n;
-    while (n--) {
-      int x;
-      cin >> x;
-      f[x] = i;
-    }
-    q[i] = queue<int>();
-  }
-  cout << "Scenario #" << ++id << endl;
-  while (scanf("%s", s) && s[0] != 'S') {
-    if (s[0] == 'E') {
-      int x;
-      cin >> x;
-      if (q[f[x]].empty()) q[0].push(f[x]);
-      q[f[x]].push(x);
-    } else {
-      int x = q[0].front();
-      cout << q[x].front() << endl;
-      q[x].pop();
-      if (q[x].empty()) q[0].pop();
-    }
-  }
-  cout << endl;
-}
+const int N = 1010, M = 1e6 + 10;
+int teamid[M]; // 存储编号为 x 的人属于哪一个队伍（队伍编号 0 ~ n-1）
 
 int main() {
-  while (cin >> t && t) Team_Queue();
+  int n, C = 1;
+  while (cin >> n, n) {
+    queue<int> team;
+    queue<int> person[N];
+    printf("Scenario #%d\n", C ++ );
+    for (int i = 0; i < n; i ++ ) {
+      int cnt;
+      cin >> cnt;
+      while (cnt -- ) {
+        int x;
+        cin >> x;
+        teamid[x] = i;
+      }
+    }
+
+    string command;
+    while (cin >> command, command != "STOP")
+      if (command == "ENQUEUE") {
+        int x;
+        cin >> x;
+        int tid = teamid[x];
+        if (person[tid].empty()) team.push(tid);
+        person[tid].push(x);
+      }
+      else {
+        int tid = team.front();
+        auto &q = person[tid];
+        cout << q.front() << endl;
+        q.pop();
+        if (q.empty()) team.pop();
+      }
+
+    cout << endl;
+  }
+
   return 0;
 }
