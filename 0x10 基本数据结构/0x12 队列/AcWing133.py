@@ -1,78 +1,50 @@
 import sys
+from collections import deque
 
 def main():
     input_data = sys.stdin.read().split()
     if not input_data:
         return
         
-    n = int(input_data[0])
-    m = int(input_data[1])
-    q = int(input_data[2])
-    u = int(input_data[3])
-    v = int(input_data[4])
-    t = int(input_data[5])
+    n, m, q, u, v, t = map(int, input_data[:6])
     
-    q1 = sorted([int(x) for x in input_data[6:6+n]], reverse=True)
-    q2 = [0] * m
-    q3 = [0] * m
+    q1 = deque(sorted((int(x) for x in input_data[6:6+n]), reverse=True))
+    q2 = deque()
+    q3 = deque()
     
-    h1 = h2 = h3 = 0
-    t2 = t3 = 0
-    delta = 0
-    
-    out1 = []
-    INF = float('inf')
-    
-    for i in range(1, m + 1):
-        v1 = q1[h1] if h1 < n else -INF
-        v2 = q2[h2] if h2 < t2 else -INF
-        v3 = q3[h3] if h3 < t3 else -INF
+    def get_max():
+        v1 = q1[0] if q1 else -float('inf')
+        v2 = q2[0] if q2 else -float('inf')
+        v3 = q3[0] if q3 else -float('inf')
         
         if v1 >= v2 and v1 >= v3:
-            x = v1
-            h1 += 1
-        elif v2 >= v1 and v2 >= v3:
-            x = v2
-            h2 += 1
-        else:
-            x = v3
-            h3 += 1
-            
-        x += delta
+            return q1.popleft()
+        if v2 >= v1 and v2 >= v3:
+            return q2.popleft()
+        return q3.popleft()
+
+    delta = 0
+    ans1 = []
+    for i in range(1, m + 1):
+        x = get_max() + delta
         if i % t == 0:
-            out1.append(str(x))
-            
+            ans1.append(str(x))
+        
         left = x * u // v
         right = x - left
+        
         delta += q
+        q2.append(left - delta)
+        q3.append(right - delta)
         
-        q2[t2] = left - delta
-        t2 += 1
-        q3[t3] = right - delta
-        t3 += 1
-        
-    print(" ".join(out1))
-    
-    out2 = []
+    ans2 = []
     for i in range(1, n + m + 1):
-        v1 = q1[h1] if h1 < n else -INF
-        v2 = q2[h2] if h2 < t2 else -INF
-        v3 = q3[h3] if h3 < t3 else -INF
-        
-        if v1 >= v2 and v1 >= v3:
-            x = v1
-            h1 += 1
-        elif v2 >= v1 and v2 >= v3:
-            x = v2
-            h2 += 1
-        else:
-            x = v3
-            h3 += 1
-            
+        x = get_max() + delta
         if i % t == 0:
-            out2.append(str(x + delta))
+            ans2.append(str(x))
             
-    print(" ".join(out2))
+    sys.stdout.write(" ".join(ans1) + "\n")
+    sys.stdout.write(" ".join(ans2) + "\n")
 
 if __name__ == '__main__':
     main()
