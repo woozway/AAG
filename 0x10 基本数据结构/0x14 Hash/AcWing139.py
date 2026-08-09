@@ -1,38 +1,67 @@
-N, P, M = 1000006, 131, 1 << 32 # MOD
-f1, f2, p = [0] * N, [0] * N, [0] * N
+import sys
 
-def H1(i, j):
-    return (f1[j] - f1[i - 1] * p[j - i + 1]) % M
-    
-def H2(i, j):
-    return (f2[i] - f2[j + 1] * p[j - i + 1]) % M
-    
 def main():
-    id_ = 0
-    p[0] = 1
-    for i in range(1, N): p[i] = (p[i - 1] * P) % M
-    while True:
-        s = input()
-        if s == 'END': break
-        s = [0] + list(s)
-        ans, len_ = 0, len(s[1:])
-        f1[0], f2[len_ + 1] = 0, 0
-        for i in range(1, len_ + 1): f1[i] = (f1[i - 1] * P + ord(s[i])) % M
-        for i in range(len_, 0, -1): f2[i] = (f2[i + 1] * P + ord(s[i])) % M
-        for i in range(1, len_ + 1):
-            l, r = 0, min(i - 1, len_ - i)
-            while l < r:
-                mid = (l + r + 1) >> 1
-                if H1(i-mid, i) == H2(i, i + mid): l = mid
-                else: r = mid - 1
-            ans = max(l * 2 + 1, ans)
-            l, r = 0, min(i - 1, len_ - i + 1)
-            while l < r:
-                mid = (l + r + 1) >> 1
-                if H1(i - mid, i - 1) == H2(i, i + mid - 1): l = mid
-                else: r = mid - 1
-            ans = max(l * 2, ans)
-        id_ += 1
-        print("Case %d: %d" %(id_, ans))
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    MASK = 0xFFFFFFFFFFFFFFFF
+    P = 131
+    
+    power = [1]
+    out = []
+    
+    for T, s in enumerate(input_data, 1):
+        if s == "END":
+            break
+            
+        n = len(s)
+        if len(power) <= n:
+            cur = power[-1]
+            for _ in range(len(power), n + 1):
+                cur = (cur * P) & MASK
+                power.append(cur)
+                
+        b_s = s.encode('ascii')
+        
+        hl = [0] * (n + 1)
+        h = 0
+        for i, c in enumerate(b_s):
+            h = (h * P + c) & MASK
+            hl[i + 1] = h
+            
+        hr = [0] * (n + 1)
+        h = 0
+        for i, c in enumerate(reversed(b_s)):
+            h = (h * P + c) & MASK
+            hr[i + 1] = h
+            
+        max_len = 0
+        for i in range(1, n + 1):
+            L = i - max_len - 1
+            if L >= 1:
+                length = max_len + 2
+                hash_l = (hl[i] - hl[L - 1] * power[length]) & MASK
+                r_L = n - i + 1
+                r_R = n - L + 1
+                hash_r = (hr[r_R] - hr[r_L - 1] * power[length]) & MASK
+                if hash_l == hash_r:
+                    max_len += 2
+                    continue
+                    
+            L = i - max_len
+            if L >= 1:
+                length = max_len + 1
+                hash_l = (hl[i] - hl[L - 1] * power[length]) & MASK
+                r_L = n - i + 1
+                r_R = n - L + 1
+                hash_r = (hr[r_R] - hr[r_L - 1] * power[length]) & MASK
+                if hash_l == hash_r:
+                    max_len += 1
+                    
+        out.append(f"Case {T}: {max_len}")
+        
+    sys.stdout.write('\n'.join(out) + '\n')
 
-main()
+if __name__ == '__main__':
+    main()
