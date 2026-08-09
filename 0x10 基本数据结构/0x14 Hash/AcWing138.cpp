@@ -1,29 +1,31 @@
-#include <iostream>
-#include <cstring>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 1000010;
-char s[N];
-// 设f[i]表示前缀子串s[1~i]的Hash值，有f[i] = f[i-1]*P + (S[i]-"a"+1)
-// 任意子串区间[l,r]的Hash值为：f[r] - f[l-1]*131^(r-l+1)
-// 这里取P=131, p[i]表示P^i
-unsigned long long f[N], p[N];
+typedef unsigned long long ULL; // 等价于对 2^64 取模
+const int N = 1e6 + 10, p = 131; // p 是哈希的进制基数
+char str[N];
+ULL h[N], power[N]; // h[i] 存储字符串前 i 个字符的哈希
+
+ULL get(int l, int r) { // 计算并返回子串 str[l...r] 的哈希值
+  return h[r] - h[l - 1] * power[r - l + 1];
+}
+
 int main() {
-  scanf("%s", s+1);
-  int n, m;
-  n = strlen(s+1);
-  cin >> m;
-  p[0] = 1; // 131^0
-  for (int i=1; i<=n; i++) {
-    f[i] = f[i-1]*131 + (s[i]-'a'+1); // hash of 1~i
-    p[i] = p[i-1]*131; // 131^i
+  scanf("%s", str + 1); // h[0] 默认为 0，避免了数组越界的麻烦
+  int n = strlen(str + 1);
+
+  power[0] = 1;
+  for (int i = 1; i <= n; i ++ ) { // 预处理前缀哈希数组 h 和次方数组 power
+    h[i] = h[i - 1] * p + str[i] - 'a' + 1;
+    power[i] = power[i - 1] * p;
   }
-  while (m--) {
+
+  int m;
+  scanf("%d", &m);
+  while (m -- ) {
     int l1, r1, l2, r2;
     scanf("%d%d%d%d", &l1, &r1, &l2, &r2);
-    // 如果 hash of l1~r1 == hash of l2~r2
-    if (f[r1] - f[l1-1]*p[r1-l1+1] == f[r2] - f[l2-1]*p[r2-l2+1])
-      puts("Yes");
-    else
-      puts("No");
+    if (get(l1, r1) == get(l2, r2)) puts("Yes");
+    else puts("No");
   }
+  return 0;
 }
