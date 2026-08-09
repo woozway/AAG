@@ -1,46 +1,38 @@
-#include <iostream>
-#include <algorithm>
-#define ll long long
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 100006;
-const ll INF = 0x3f3f3f3f3f3f3f3f;
-struct A {
-  ll a; // a是值，因为相减可能爆long long，w是原序列中的下标
-  int w, prv, nxt;
-  bool operator < (const A x) const {
-    return a < x.a;
-  }
-} a[N];
-int n, b[N]; // b[i]存储排序后Ai对应在链表中的位置
-struct ANS {
-  ll x; // 和a[i].a同理，可能爆long long
-  int k; // x是|Aj-Ai|差的绝对值，k是Aj下标
-} ans[N];
+typedef long long LL;
+typedef pair<LL, int> PLI;
+const int N = 1e5 + 10;
+int n;
+int l[N], r[N]; // 双向链表
+int p[N]; // p[k] = i 表示 [原数组中第 k 个输入的元素]，在 [排序后的数组 a] 中位于下标 i
+PLI a[N], ans[N]; // a (first: 元素值, second: 原下标)
 
 int main() {
   cin >> n;
-  for (int i=1; i<=n; i++) {
-    cin >> a[i].a;
-    a[i].w = i;
+  for (int i = 1; i <= n; i ++ ) {
+    cin >> a[i].first;
+    a[i].second = i;
   }
-  sort(a+1, a+n+1);
-  for (int i=1; i<=n; i++) {
-    b[a[i].w] = i;
-    a[i].prv = i - 1;
-    a[i].nxt = i + 1;
+  sort(a + 1, a + 1 + n); // 排序后，值最接近的元素在数组中一定是相邻的
+
+  a[0].first = -4e9, a[n + 1].first = 4e9; // 哨兵
+  for (int i = 1; i <= n; i ++ ) {
+    l[i] = i - 1, r[i] = i + 1;
+    p[a[i].second] = i; // 后续可以 O(1) 找到任意原序列元素在链表里的位置
   }
-  // 倒着从n->1，因为对于第An个数，可以从前面所有的数中找Aj，完成后删除节点
-  a[0].a = -INF, a[n+1].a = INF; // 设立哨兵head, tail，降低编码难度
-  for (int i=n; i>1; i--) {
-    ans[i].x = a[a[b[i]].nxt].a - a[b[i]].a;
-    ans[i].k = a[a[b[i]].nxt].w;
-    if (a[b[i]].a - a[a[b[i]].prv].a <= ans[i].x) {
-      ans[i].x = a[b[i]].a - a[a[b[i]].prv].a;
-      ans[i].k = a[a[b[i]].prv].w;
-    }
-    a[a[b[i]].prv].nxt = a[b[i]].nxt;
-    a[a[b[i]].nxt].prv = a[b[i]].prv;
+
+  for (int i = n; i > 1; i -- ) { // 逆序求解
+    int j = p[i], left = l[j], right = r[j];
+    LL left_value = abs(a[left].first - a[j].first);
+    LL right_value = abs(a[right].first - a[j].first);
+    if (left_value <= right_value) ans[i] = {left_value, a[left].second};
+    else ans[i] = {right_value, a[right].second};
+    l[right] = left, r[left] = right; // 删除操作只需修改左右邻居的指针
   }
-  for (int i=2; i<=n; i++) cout << ans[i].x << " " << ans[i].k << endl;
+
+  for (int i = 2; i <= n; i ++ )
+    cout << ans[i].first << ' ' << ans[i].second << endl;
+
   return 0;
 }
