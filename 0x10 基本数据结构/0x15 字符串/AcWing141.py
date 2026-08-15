@@ -1,25 +1,38 @@
-a, nxt = [0] * 1000010, [0] * 1000010
-n, T = 0, 0
-
-def calc_next():
-    global n, T
-    nxt[1], j = 0, 0
-    for i in range(2, n + 1):
-        while j > 0 and a[i] != a[j + 1]: j = nxt[j]
-        if a[i] == a[j + 1]: j += 1
-        nxt[i] = j
+import sys
 
 def main():
-    global n, T
-    while True:
-        n = int(input())
-        if n == 0: break
-        a[1:] = list(input())
-        calc_next()
-        T += 1; print("Test case #%d" %T)
-        for i in range(2, n + 1):
-            if i % (i - nxt[i]) == 0 and i // (i - nxt[i]) > 1:
-                print("%d %d" %(i, i // (i - nxt[i])))
-        print()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
         
-main()
+    it = iter(input_data)
+    T = 1
+    
+    for n_str in it:
+        n = int(n_str)
+        if n == 0:
+            break
+            
+        s = next(it)
+        
+        nxt = [0] * n
+        j = 0
+        for i in range(1, n):
+            while j > 0 and s[i] != s[j]:
+                j = nxt[j - 1]
+            if s[i] == s[j]:
+                j += 1
+            nxt[i] = j
+            
+        sys.stdout.write(f"Test case #{T}\n")
+        T += 1
+        
+        for i in range(1, n):
+            length = i + 1
+            t = length - nxt[i]
+            if length > t and length % t == 0:
+                sys.stdout.write(f"{length} {length // t}\n")
+        sys.stdout.write("\n")
+
+if __name__ == '__main__':
+    main()
