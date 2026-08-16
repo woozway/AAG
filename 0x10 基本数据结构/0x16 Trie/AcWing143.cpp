@@ -1,38 +1,42 @@
 #include <iostream>
 using namespace std;
-const int N = 100006 * 33;
-int trie[N][2];
+const int N = 1e5 + 10, M = N * 31;
+int son[M][2], idx;
+int n;
 
-int main() {
-  int n;
-  cin >> n;
-  int ans = 0, t = 1; // t就是tot
-  for (int i=1; i<=n; i++) {
-    int a;
-    scanf("%d", &a);
-    // 把每个整数看作长度为31的二进制01串（数值较小时前面补0）
-    int p = 1;
-    for (int j=31; j>=0; j--) {
-      int k = (a >> j) & 1;
-      if (!trie[p][k]) trie[p][k] = ++t;
-      p = trie[p][k];
-    }
-    p = 1;
-    if (i > 1) {
-      int w = 0;
-      for (int j=31; j>=0; j--) {
-        int k = (a >> j) & 1;
-        if (trie[p][k^1]) { // 如果与Ai的当前为相反的字符指针不空
-          w = (w << 1) + (k ^ 1);
-          p = trie[p][k^1];
-        } else { // 反之，空
-          w = (w << 1) + k;
-          p = trie[p][k];
-        }
-      }
-      ans = max(ans, w ^ a);
-    }
+// trie[a][b]：a表示节点编号（和最多有多少个节点有关），b表示分叉
+// 这里只根据0/1分叉，所以b=2；而因为有N个数，每个数需要31位，
+// 假设这些数各自都没有公共前缀，那么上限会有N*31个节点，即a=N*31
+void insert(int x) {
+  int p = 0;
+  for (int i = 30; i >= 0; i -- ) {
+    int t = x >> i & 1;
+    if (!son[p][t]) son[p][t] = ++ idx;
+    p = son[p][t];
   }
-  cout << ans << endl;
+}
+
+int query(int x) {
+  int p = 0, res = 0;
+  for (int i = 30; i >= 0; i -- ) {
+    int t = x >> i & 1;
+    if (son[p][!t]) res += 1 << i, p = son[p][!t]; // 尝试找能使异或后的数变大的，即异或后为1的
+    else p = son[p][t]; // 没有找到，将就一下
+  }
+  return res;
+}
+
+int main() { // 可引申为trie存汉字等应用
+  cin >> n;
+
+  int res = 0;
+  for (int i = 0; i < n; i ++ ) {
+    int a;
+    scanf("%d", &a); // 直接在线处理
+    insert(a); // 这里为插入第一个元素时不特判，改变顺序为先插入再查询，效果不变
+    res = max(res, query(a));
+  }
+
+  cout << res << endl;
   return 0;
 }

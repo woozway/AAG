@@ -1,28 +1,38 @@
-N = 100006 * 33
-trie = [[0] * 2 for _ in range(N)]
+import sys
 
 def main():
-    n = int(input())
-    ans, t = 0, 1
-    aa = [int(x) for x in input().split()]
-    for i in range(1, n + 1):
-        a, p = aa[i - 1], 1
-        for j in range(31, -1, -1):
-            k = (a >> j) & 1
-            if not trie[p][k]: t += 1; trie[p][k] = t
-            p = trie[p][k]
-        p = 1
-        if i > 1:
-            w = 0
-            for j in range(31, -1, -1):
-                k = (a >> j) & 1
-                if trie[p][k ^ 1]:
-                    w = (w << 1) + (k ^ 1)
-                    p = trie[p][k ^ 1]
-                else:
-                    w = (w << 1) + k
-                    p = trie[p][k]
-            ans = max(ans, w ^ a)
-    print(ans)
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    nums = [int(x) for x in input_data[1:]]
+    trie = [[0, 0]]
+    
+    max_xor = 0
+    for x in nums:
+        p = 0
+        for i in range(30, -1, -1):
+            bit = (x >> i) & 1
+            if not trie[p][bit]:
+                trie.append([0, 0])
+                trie[p][bit] = len(trie) - 1
+            p = trie[p][bit]
+            
+        p = 0
+        curr_xor = 0
+        for i in range(30, -1, -1):
+            bit = (x >> i) & 1
+            inv_bit = bit ^ 1
+            if trie[p][inv_bit]:
+                curr_xor |= (1 << i)
+                p = trie[p][inv_bit]
+            else:
+                p = trie[p][bit]
+                
+        if curr_xor > max_xor:
+            max_xor = curr_xor
+            
+    print(max_xor)
 
-main()
+if __name__ == '__main__':
+    main()
