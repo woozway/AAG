@@ -1,31 +1,39 @@
-N = 1000006
-trie, tot, s = [[0] * 27 for _ in range(N)], 1, ""
+import sys
 
-def add():
-    global tot, s
-    len_, p = len(s), 1
-    for i in range(len_):
-        k = ord(s[i]) - ord('a') + 1
-        if not trie[p][k]: tot += 1; trie[p][k] = tot
-        p = trie[p][k]
-    trie[p][0] += 1
-    
-def get():
-    global s
-    ans, len_, p = 0, len(s), 1
-    for i in range(len_):
-        p = trie[p][ord(s[i]) - ord('a') + 1]
-        ans += trie[p][0]
-    print(ans)
-    
 def main():
-    global s
-    n, m = [int(x) for x in input().split()]
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    it = iter(input_data)
+    n = int(next(it))
+    m = int(next(it))
+    
+    trie = [{}]
+    cnt = [0]
+    
     for _ in range(n):
-        s = input()
-        add()
+        p = 0
+        for char in next(it):
+            if char not in trie[p]:
+                trie[p][char] = len(trie)
+                trie.append({})
+                cnt.append(0)
+            p = trie[p][char]
+        cnt[p] += 1
+        
+    out = []
     for _ in range(m):
-        s = input()
-        get()
+        p = 0
+        res = 0
+        for char in next(it):
+            if char not in trie[p]:
+                break
+            p = trie[p][char]
+            res += cnt[p]
+        out.append(str(res))
+        
+    sys.stdout.write('\n'.join(out) + '\n')
 
-main()
+if __name__ == '__main__':
+    main()
