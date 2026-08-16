@@ -1,57 +1,57 @@
-N = 100006
-n, d, trie, tot = 0, [0] * N, [[0] * 2 for _ in range(N*33)], 0
-head, ver, edge, nxt, v = [0] * N, [0] * (N * 2), [0] * (N * 2), [0] * (N * 2), [0] * N
-
-def dfs(x):
-    global n, tot
-    i = head[x]
-    while i:
-        y, z = ver[i], edge[i]
-        if v[y]: i = nxt[i]; continue
-        v[y] = 1
-        d[y] = d[x] ^ z
-        dfs(y)
-        i = nxt[i]
-        
-def add(x, y, z):
-    global n, tot
-    tot += 1; ver[tot] = y; edge[tot] = z
-    nxt[tot] = head[x]; head[x] = tot
-    
-def The_xor_longest_Path():
-    global n, tot
-    v[0] = 1
-    tot = 1
-    for _ in range(1, n):
-        u, v_, w = [int(x) for x in input().split()]
-        add(u, v_, w)
-        add(v_, u, w)
-        
-    dfs(0)
-    ans = 0
-    for i in range(n):
-        p = 1
-        for j in range(31, -1, -1):
-            k = (d[i] >> j) & 1
-            if not trie[p][k]: tot += 1; trie[p][k] = tot
-            p = trie[p][k]
-        p = 1
-        if i:
-            w = 0
-            for j in range(31, -1, -1):
-                k = (d[i] >> j) & 1
-                if trie[p][k^1]:
-                    w = (w << 1) + (k ^ 1)
-                    p = trie[p][k^1]
-                else:
-                    w = (w << 1) + k
-                    p = trie[p][k]
-            ans = max(ans, w ^ d[i])
-    print(ans)
+import sys
 
 def main():
-    global n, tot
-    n = int(input())
-    The_xor_longest_Path()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    n = int(input_data[0])
     
-main()
+    g = [[] for _ in range(n)]
+    idx = 1
+    for _ in range(n - 1):
+        u = int(input_data[idx])
+        v = int(input_data[idx+1])
+        w = int(input_data[idx+2])
+        g[u].append((v, w))
+        g[v].append((u, w))
+        idx += 3
+        
+    a = [0] * n
+    stack = [(0, -1, 0)]
+    while stack:
+        u, p, s = stack.pop()
+        a[u] = s
+        for v, w in g[u]:
+            if v != p:
+                stack.append((v, u, s ^ w))
+                
+    trie = [[0, 0]]
+    for x in a:
+        p = 0
+        for i in range(30, -1, -1):
+            bit = (x >> i) & 1
+            if not trie[p][bit]:
+                trie.append([0, 0])
+                trie[p][bit] = len(trie) - 1
+            p = trie[p][bit]
+            
+    max_xor = 0
+    for x in a:
+        p = 0
+        curr = 0
+        for i in range(30, -1, -1):
+            bit = (x >> i) & 1
+            inv = bit ^ 1
+            if trie[p][inv]:
+                curr |= (1 << i)
+                p = trie[p][inv]
+            else:
+                p = trie[p][bit]
+        if curr > max_xor:
+            max_xor = curr
+            
+    print(max_xor)
+
+if __name__ == '__main__':
+    main()
