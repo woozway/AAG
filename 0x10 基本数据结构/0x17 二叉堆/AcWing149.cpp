@@ -1,32 +1,35 @@
-#include <iostream>
-#include <queue>
-#define ll long long
+#include <bits/stdc++.h>
 using namespace std;
-priority_queue<pair<ll, ll> > q;
+typedef long long LL;
+typedef pair<LL, int> PLI; // <当前子树的权重之和, 当前树的深度>
+const int N = 1e5 + 10;
 
 int main() {
-  int n, k;
-  cin >> n >> k;
-  for (int i=1; i<=n; i++) {
-    ll a;
-    scanf("%lld", &a);
-    q.push(make_pair(-a, 0)); // 小根堆存负值
+  int n, m;
+  cin >> n >> m;
+
+  priority_queue<PLI, vector<PLI>, greater<PLI>> heap;
+  for (int i = 0; i < n; i ++ ) {
+    LL w;
+    cin >> w;
+    heap.push({w, 0}); // 初始时，每个单词都是一个叶子节点，深度为 0
   }
-  while ((n-1) % (k-1)) {
-    ++n; // k叉Huffman树，让子节点不足k个的情况发生在最底层
-    q.push(make_pair(0, 0)); // (-单词出现频率，-k进制串si的最大长度)
-  }
-  ll ans = 0;
-  while (q.size() != 1) {
-    ll num = 0, w = 0;
-    for (int i=1; i<=k; i++) {
-      num += q.top().first; // 取出的k个节点，不仅要a最小，w也要最小
-      w = min(w, q.top().second); // 取出当前的k个节点中k进制串s长度最大的
-      q.pop();
+
+  while ((n - 1) % (m - 1)) heap.push({0ll, 0}), n ++ ; // 补零
+
+  LL res = 0;
+  while (heap.size() > 1) {
+    LL sum = 0;
+    int depth = 0;
+    for (int i = 0; i < m; i ++ ) {
+      sum += heap.top().first;
+      depth = max(depth, heap.top().second);
+      heap.pop();
     }
-    ans += -num;
-    q.push(make_pair(num, w-1));
+    res += sum;
+    heap.push({sum, depth + 1}); // 新节点的深度 = 最大子树深度 + 1
   }
-  cout << ans << endl << -q.top().second << endl;
+  cout << res << endl << heap.top().second << endl;
+
   return 0;
 }
