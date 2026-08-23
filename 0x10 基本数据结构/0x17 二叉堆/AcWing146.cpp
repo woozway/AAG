@@ -1,53 +1,51 @@
-#include <iostream>
-#include <queue>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
-const int N = 2006;
-int t, m, n, a[N], b[N], c[N]; // c[i]中存二路归并的和
-typedef pair<int, int> pii; // 存两路归并的和s以及当前一路最前面元素的下标p
-// 因为a已有序，初始化时b[1~n]分别与a[1]结合形成n路（每一路都是从小到大）：
-//   b[1]+a[1], b[1]+a[2], ..., b[1]+a[n]
-//   b[2]+a[1], b[2]+a[2], ..., b[2]+a[n]
-//   ...
-//   b[n]+a[1], b[n]+a[2], ..., b[n]+a[n]
-// 取该nxn矩阵第一列入队作小根堆，取出最小值后，将取出元素那一路中的下一个元素入队
+typedef pair<int, int> PII; // <当前组合的和s, 这个和在数组 a 中对应的下标p>
+const int N = 2010;
+// a: 存储合并过程中的前 n 个最小和，始终保持有序
+// b: 当前正在读取的、等待与 a 合并的新数组
+// c: 临时数组，用于暂存 a 和 b 合并后的前 n 个最小和
+int n, m, a[N], b[N], c[N];
+
 void merge() {
-  priority_queue<pii, vector<pii>, greater<pii> > q; // c++小根堆语法糖
-  for (int i=1; i<=n; i++) q.push({a[1]+b[i], 1});
-  for (int i=1; i<=n; i++) {
-    auto t = q.top(); q.pop();
+  priority_queue<PII, vector<PII>, greater<PII>> heap;
+  for (int i = 0; i < n; i ++ ) heap.push({b[i] + a[0], 0});
+
+  for (int i = 0; i < n; i ++ ) {
+    auto t = heap.top(); heap.pop();
     int s = t.first, p = t.second;
     c[i] = s;
-    q.push({s-a[p]+a[p+1], p+1}); // b[k]=s-a[p]，k即代表nxn矩阵中的哪一行
+    // 既然 a[p] + b[i] 被取走了，那么对于当前的 b[i] 来说，
+    // 下一个最小的潜在组合就是 a[p + 1] + b[i]
+    heap.push({s - a[p] + a[p + 1], p + 1});
   }
-  for (int i=1; i<=n; i++) a[i] = c[i];
-
-  // priority_queue<pair<int, int> > q; // 默认为大根堆，小根堆取负即可
-  // for (int i=1; i<=n; i++) q.push({-(a[1]+b[i]), 1});
-  // for (int i=1; i<=n; i++) {
-  //   auto t = q.top(); q.pop();
-  //   int s = -t.first, p = t.second;
-  //   c[i] = s;
-  //   q.push({-(s-a[p]+a[p+1]), p+1});
-  // }
-  // for (int i=1; i<=n; i++) a[i] = c[i];
-}
-// 多路归并：即m-1次两路归并
-void Sequence() {
-  cin >> m >> n;
-  for (int i=1; i<=n; i++) scanf("%d", &a[i]);
-  sort(a+1, a+n+1);
-  --m;
-  while (m--) {
-    for (int j=1; j<=n; j++) scanf("%d", &b[j]);
-    merge(); // 二路归并a和b，a中保存最终结果
-  }
-  for (int i=1; i<=n; i++) printf("%d ", a[i]);
-  cout << endl;
+  // 将合并后的前 n 个最小和复制回 a 数组
+  for (int i = 0; i < n; i ++ ) a[i] = c[i];
 }
 
+// 将 m 个数组的合并问题，转化为 m-1 次两个数组的合并问题
+// 因为a已有序，初始化时 b[0~n-1] 分别与 a[0] 结合形成 n 路（每一路都是从小到大）：
+//   b[0] + a[0], b[0] + a[1], ..., b[0] + a[n-1]
+//   b[1] + a[0], b[1] + a[1], ..., b[1] + a[n-1]
+//   ...
+//   b[n-1] + a[0], b[n-1] + a[1], ..., b[n-1] + a[n-1]
+// 取 (n, n) 矩阵第一列入队作小根堆，取出最小值后，将取出元素那行的下一个元素入队
 int main() {
-  cin >> t;
-  while (t--) Sequence();
+  int T;
+  cin >> T;
+  while (T -- ) {
+    cin >> m >> n;
+    for (int i = 0; i < n; i ++ ) scanf("%d", &a[i]);
+    sort(a, a + n); // 初始必须将 a 排序，这是 merge 逻辑成立的基础前提
+
+    for (int i = 0; i < m - 1; i ++ ) { // 剩下的 m - 1 个数组，边读入边和 a 进行合并
+      for (int j = 0; j < n; j ++ ) scanf("%d", &b[j]);
+      merge(); // 合并 a 和 b，始终保留前 n 个最小的在 a 中
+    }
+
+    for (int i = 0; i < n; i ++ ) printf("%d ", a[i]);
+    puts("");
+  }
+
   return 0;
 }

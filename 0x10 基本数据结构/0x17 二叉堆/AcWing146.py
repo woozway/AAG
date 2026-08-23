@@ -1,29 +1,38 @@
-from heapq import heappush, heappop
-N = 2006
-m, n = 0, 0
-a, b, c = [0] * N, [0] * N, [0] * N
+import sys
+import heapq
 
-def merge():
-    q = []
-    for i in range(1, n + 1): heappush(q, (a[1] + b[i], 1))
-    for i in range(1, n + 1):
-        s, p = heappop(q)
-        c[i] = s
-        heappush(q, (s - a[p] + a[p + 1], p + 1))
-    for i in range(1, n + 1): a[i] = c[i]
-    
-def Sequence():
-    global m, n
-    m, n = [int(x) for x in input().split()]
-    a[1 : n + 1] = sorted([int(x) for x in input().split()])
-    for _ in range(m - 1):
-        b[1 : n + 1] = [int(x) for x in input().split()]
-        merge()
-    for i in range(1, n+1): print("%d " %a[i], end='')
-    print()
-    
 def main():
-    t = int(input())
-    for _ in range(t): Sequence()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    it = iter(int(x) for x in input_data)
+    T = next(it)
+    out = []
     
-main()
+    for _ in range(T):
+        m = next(it)
+        n = next(it)
+        
+        a = sorted(next(it) for _ in range(n))
+        
+        for _ in range(m - 1):
+            b = [next(it) for _ in range(n)]
+            
+            heap = [(b[i] + a[0], 0) for i in range(n)]
+            heapq.heapify(heap)
+            
+            c = []
+            for _ in range(n):
+                s, p = heapq.heappop(heap)
+                c.append(s)
+                if p + 1 < n:
+                    heapq.heappush(heap, (s - a[p] + a[p + 1], p + 1))
+            a = c
+            
+        out.append(' '.join(map(str, a)))
+        
+    sys.stdout.write('\n'.join(out) + '\n')
+
+if __name__ == '__main__':
+    main()
