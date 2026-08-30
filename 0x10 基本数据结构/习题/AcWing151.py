@@ -1,57 +1,88 @@
-nums, ops = [], []
+import sys
 
-def calc():
-    b = nums.pop()
-    a = nums.pop()
-    c = ops.pop()
-    if c == '+': d = a + b
-    elif c == '-': d = a - b
-    elif c == '*': d = a * b
-    elif c == '/': d = int(a / b)
-    else: d = a**b
-    nums.append(d)
-    
 def main():
-    s = input()
-    s = '(' + s + ')'
-    l, r = 0, 0
-    for i in range(len(s)):
-        if s[i] == '(': l += 1
-        if s[i] == ')': r += 1
-    if l >= r: s = s + ')'*(l-r)
-    else: s = '('*(r-l) + s
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    s = input_data[0]
+    
+    if s and s[0] == '-':
+        s = '0' + s
+        
+    s = '(' * (len(s) + 1) + s + ')'
+    
+    nums = []
+    ops = []
+    
+    def cal():
+        a = nums.pop()
+        b = nums.pop()
+        c = ops.pop()
+        
+        if c == '+':
+            nums.append(b + a)
+        elif c == '-':
+            nums.append(b - a)
+        elif c == '*':
+            nums.append(b * a)
+        elif c == '/':
+            nums.append(int(b / a))
+        elif c == '^':
+            nums.append(b ** a)
+
     i = 0
-    while i < len(s):
+    n = len(s)
+    
+    while i < n:
         if s[i].isdigit():
-            j, t = i, 0
-            while s[j].isdigit(): t = t*10 + ord(s[j])-ord('0'); j += 1
-            i = j-1
-            nums.append(t)
+            j = i
+            while j < n and s[j].isdigit():
+                j += 1
+            nums.append(int(s[i:j]))
+            i = j - 1
         else:
             c = s[i]
-            if c == '(': ops.append(c)
-            elif c == ')':
-                while ops[-1] != '(': calc()
-                ops.pop()
-            elif c == '+' or c == '-':
-                if c=='-' and i and not s[i-1].isdigit() and s[i-1]!=')':
-                    if s[i+1] == '(':
-                        nums.append(-1); ops.append('*')
+            if c == '(':
+                ops.append(c)
+            elif c in '+-':
+                if c == '-' and i > 0 and not s[i - 1].isdigit() and s[i - 1] != ')':
+                    if i + 1 < n and s[i + 1] == '(':
+                        nums.append(-1)
+                        ops.append('*')
                     else:
-                        j, t = i+1, 0
-                        while s[j].isdigit(): t = t*10 + ord(s[j])-ord('0'); j += 1
-                        i = j-1
-                        nums.append(-t)
+                        j = i + 1
+                        while j < n and s[j].isdigit():
+                            j += 1
+                        nums.append(-int(s[i + 1:j]))
+                        i = j - 1
                 else:
-                    while ops[-1] != '(': calc()
+                    while ops and ops[-1] != '(':
+                        cal()
                     ops.append(c)
-            elif c == '*' or c == '/':
-                while ops[-1]=='*' or ops[-1]=='/' or ops[-1]=='^': calc()
+            elif c in '*/':
+                while ops and ops[-1] in '*/^':
+                    cal()
                 ops.append(c)
             elif c == '^':
-                while ops[-1] == '^': calc()
+                while ops and ops[-1] == '^':
+                    cal()
                 ops.append(c)
+            elif c == ')':
+                while ops and ops[-1] != '(':
+                    cal()
+                if ops:
+                    ops.pop()
         i += 1
-    print(nums[-1])
-    
-main()
+
+    while ops:
+        if ops[-1] == '(':
+            ops.pop()
+        else:
+            cal()
+
+    if nums:
+        print(nums[0])
+
+if __name__ == '__main__':
+    main()
