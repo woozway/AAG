@@ -1,31 +1,35 @@
-N = 1006
-a = [[0]*N for _ in range(N)]
-t, n, m, h, s, w = 0, 0, 0, [0]*N, [0]*N, [0]*N
+import sys
 
-def ddz(k):
-    for i in range(1, m+1):
-        if a[k][i] == 'F': h[i] += 1
-        else: h[i] = 0
-    ans, p = 0, 0
-    for i in range(1, m+2):
-        if h[i] > s[p]:
-            p += 1; s[p] = h[i]; w[p] = 1
-        else:
-            width = 0
-            while s[p] > h[i]:
-                width += w[p]
-                ans = max(ans, width * s[p])
-                p -= 1
-            p += 1; s[p] = h[i]; w[p] = width+1
-    return ans
-    
 def main():
-    global t, n, m
-    n, m = [int(x) for x in input().split()]
-    for i in range(1, n+1):
-        a[i][1:m+1] = input().split()
-    ans = 0
-    for i in range(1, n+1): ans = max(ans, ddz(i))
-    print(3*ans)
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+        
+    n = int(input_data[0])
+    m = int(input_data[1])
+    
+    heights = [0] * (m + 1)
+    max_area = 0
+    idx = 2
+    
+    for _ in range(n):
+        for j in range(m):
+            if input_data[idx] == 'F':
+                heights[j] += 1
+            else:
+                heights[j] = 0
+            idx += 1
+            
+        stack = []
+        for i in range(m + 1):
+            while stack and heights[stack[-1]] >= heights[i]:
+                h = heights[stack.pop()]
+                w = i if not stack else i - stack[-1] - 1
+                if h * w > max_area:
+                    max_area = h * w
+            stack.append(i)
+            
+    print(max_area * 3)
 
-main()
+if __name__ == '__main__':
+    main()
