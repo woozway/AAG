@@ -1,51 +1,65 @@
-N = 1010
-n, g, a, f, color = 0, [[0]*N for _ in range(N)], [0]*N, [0]*N, [0]*N
+import sys
 
-def dfs(u, c):
-    global n
-    color[u] = c
-    for j in range(1, n+1):
-        if not g[u][j]: continue
-        if color[j]:
-            if color[j] == c: return False
-        elif not dfs(j, 3-c): return False
-    return True
-    
-def check(a, b):
-    if a == b: return True
-    if a > b: a, b = b, a
-    return (a=='a' and b=='d') or (a=='b' and b=='c')
-    
 def main():
-    global n
-    n = int(input())
-    a[1:n+1] = [int(x) for x in input().split()]
-    f[n+1] = n+1
-    for i in range(n, 0, -1): f[i] = min(a[i], f[i+1])
-    
-    for i in range(1, n+1):
-        for j in range(i+1, n+1):
-            if a[i]<a[j] and f[j+1]<a[i]:
-                g[i][j] = g[j][i] = 1
-    
-    for i in range(1, n+1):
-        if not color[i] and not dfs(i, 1):
-            print("0")
+    sys.setrecursionlimit(2000)
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+
+    n = int(input_data[0])
+    a = [int(x) for x in input_data[1:n + 1]]
+
+    f = [float('inf')] * (n + 1)
+    for i in range(n - 1, -1, -1):
+        f[i] = min(f[i + 1], a[i])
+
+    g = [[] for _ in range(n)]
+    for i in range(n):
+        for j in range(i + 1, n):
+            if a[i] < a[j] and f[j + 1] < a[i]:
+                g[i].append(j)
+                g[j].append(i)
+
+    color = [-1] * n
+
+    def dfs(u, c):
+        color[u] = c
+        for v in g[u]:
+            if color[v] == c:
+                return False
+            if color[v] == -1 and not dfs(v, 1 - c):
+                return False
+        return True
+
+    for i in range(n):
+        if color[i] == -1 and not dfs(i, 0):
+            print(0)
             return
-    
-    ans = []
-    s1, s2, cur = [], [], 1
-    for i in range(1, n+1):
-        if color[i] == 1: s1.append(a[i]); ans.append('a')
-        else: s2.append(a[i]); ans.append('c')
-        while (s1 and s1[-1]==cur) or (s2 and s2[-1]==cur):
-            if s1 and s1[-1]==cur: s1.pop(); cur += 1; ans.append('b')
-            else: s2.pop(); cur += 1; ans.append('d')
-    for i in range(len(ans)):
-        j = i+1
-        while j<len(ans) and check(ans[i], ans[j]): j += 1
-        ans[i:j] = sorted(ans[i:j])
-        i = j
-    for c in ans: print("%c " %c, end='')
-    
-main()
+
+    stk1, stk2 = [], []
+    now = 1
+    i = 0
+    ops = []
+
+    while now <= n:
+        if i < n and color[i] == 0 and (not stk1 or stk1[-1] > a[i]):
+            stk1.append(a[i])
+            ops.append('a')
+            i += 1
+        elif stk1 and stk1[-1] == now:
+            stk1.pop()
+            ops.append('b')
+            now += 1
+        elif i < n and color[i] == 1 and (not stk2 or stk2[-1] > a[i]):
+            stk2.append(a[i])
+            ops.append('c')
+            i += 1
+        elif stk2 and stk2[-1] == now:
+            stk2.pop()
+            ops.append('d')
+            now += 1
+
+    print(' '.join(ops))
+
+if __name__ == '__main__':
+    main()
