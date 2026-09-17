@@ -1,23 +1,39 @@
-N = 1000006
-a, q = [0]*N, [0]*N
+import sys
+from collections import deque
 
 def main():
-    n, k = [int(x) for x in input().split()]
-    a[1:n+1] = [int(x) for x in input().split()]
-    
-    l, r = 0, -1
-    for i in range(1, n+1):
-        while l<=r and q[l]<=i-k: l += 1
-        while l<=r and a[q[r]]>=a[i]: r -= 1
-        r += 1; q[r] = i
-        if i >= k: print("%d " %a[q[l]], end='')
-    print()
-    
-    l, r = 0, -1
-    for i in range(1, n+1):
-        while l<=r and q[l]<=i-k: l += 1
-        while l<=r and a[q[r]]<=a[i]: r -= 1
-        r += 1; q[r] = i
-        if i >= k: print("%d " %a[q[l]], end='')
-    
-main()
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+
+    n = int(input_data[0])
+    k = int(input_data[1])
+    a = [int(x) for x in input_data[2:n + 2]]
+
+    min_res = []
+    q = deque()
+    for i in range(n):
+        if q and q[0] < i - k + 1:
+            q.popleft()
+        while q and a[q[-1]] >= a[i]:
+            q.pop()
+        q.append(i)
+        if i >= k - 1:
+            min_res.append(str(a[q[0]]))
+
+    max_res = []
+    q.clear()
+    for i in range(n):
+        if q and q[0] < i - k + 1:
+            q.popleft()
+        while q and a[q[-1]] <= a[i]:
+            q.pop()
+        q.append(i)
+        if i >= k - 1:
+            max_res.append(str(a[q[0]]))
+
+    sys.stdout.write(' '.join(min_res) + '\n')
+    sys.stdout.write(' '.join(max_res) + '\n')
+
+if __name__ == '__main__':
+    main()
