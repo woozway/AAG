@@ -6,7 +6,7 @@ string dfs(string &seq, int &u) {
   u ++ ;
   vector<string> seqs; // 存储当前节点的所有子树的“最小表示”
   while (seq[u] == '0') seqs.push_back(dfs(seq, u));
-  u ++ ; // 相当于吃掉这个 '1'
+  u ++ ; // 此时 seq[u] == '1'，跳过这个 '1'（退出当前节点）
 
   sort(seqs.begin(), seqs.end()); // 对所有子树的表示字符串进行字典序排序
 
