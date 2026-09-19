@@ -1,29 +1,37 @@
-#include <iostream>
-#include <algorithm>
-#include <vector>
+#include <bits/stdc++.h>
 using namespace std;
-// 求出以当前点为根的树的最小表示：0表示往下递归，1表示往上退出递归
-string dfs(string &seq, int &i) {
-  vector<string> seqs; // 存各子节点的最小表示
-  i++;
-  while (seq[i] == '0') seqs.push_back(dfs(seq, i));
-  i++;
-  sort(seqs.begin(), seqs.end());
-  string ans = "0";
-  for (auto s: seqs) ans += s;
-  ans += '1';
-  return ans;
+
+// 解析当前子树，并返回该子树的“最小表示”（唯一标识字符串）
+string dfs(string &seq, int &u) {
+  u ++ ;
+  vector<string> seqs; // 存储当前节点的所有子树的“最小表示”
+  while (seq[u] == '0') seqs.push_back(dfs(seq, u));
+  u ++ ; // 相当于吃掉这个 '1'
+
+  sort(seqs.begin(), seqs.end()); // 对所有子树的表示字符串进行字典序排序
+
+  // 组装当前这棵子树的最终表示，格式为："0" + (所有子树的最小表示按字典序拼接) + "1"
+  string res = "0";
+  for (auto &s : seqs) res += s;
+  res += '1';
+  return res;
 }
 
 int main() {
-  int t;
-  cin >> t;
-  while (t--) {
+  int T;
+  cin >> T;
+  while (T -- ) {
     string a, b;
     cin >> a >> b;
-    a = '0' + a + '1', b = '0' + b + '1'; // 防止额外处理边界
-    int ia = 0, ib = 0; // 下标
-    if (dfs(a, ia) == dfs(b, ib)) puts("same");
+
+    // 加虚拟根节点，保证整个序列是一棵单一完整的大树，一次 dfs() 就能全部解析完
+    a = '0' + a + '1';
+    b = '0' + b + '1';
+    int ua = 0, ub = 0; // 初始化遍历指针
+    auto ra = dfs(a, ua), rb = dfs(b, ub);
+
+    if (ra == rb) puts("same");
     else puts("different");
   }
+  return 0;
 }
