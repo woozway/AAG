@@ -1,33 +1,40 @@
-#include <iostream>
-#include <cstring>
+#include <bits/stdc++.h>
 using namespace std;
-char a[2000010], b[2000010];
-int n, ans;
+const int N = 2e6 + 10;
+int n;
+char a[N], b[N];
 
-int calc_min(char *s) { // 计算字符串的最小表示
-  int i = 1, j = 2, k;
-  while (i <= n && j <= n) {
-    for (k=0; k<n && s[i+k]==s[j+k]; k++);
-    if (k == n) break;
-    if (s[i+k] > s[j+k]) i += k + 1;
+int get_min(char str[]) { // 求字符串的最小表示法的起始下标
+  int i = 0, j = 1; // i 和 j 是两个候选的起始位置，初始时错开
+  while (i < n && j < n) {
+    int k = 0; // k 表示当前从 i 和 j 开始，能够匹配的相同字符的长度
+    while (k < n && str[i + k] == str[j + k]) k ++ ;
+    if (k == n) break; // 如果 k 达到 n，说明字符串有循环节，或两个候选位置完全相同
+
+    if (str[i + k] > str[j + k]) i += k + 1;
     else j += k + 1;
-    if (i == j) i++;
+
+    if (i == j) i ++ ;
   }
-  ans = min(i, j);
-  s[ans + n] = '\0';
-  return ans;
+  int res = min(i, j); // 最小的那个起始位置就是答案
+  str[res + n] = 0;
+  return res;
 }
 
 int main() {
-  scanf("%s%s", a + 1, b + 1);
-  n = strlen(a + 1);
-  memcpy(a+n+1, a+1, n);
-  memcpy(b+n+1, b+1, n);
-  int x = calc_min(a), y = calc_min(b);
-  if (strcmp(a + x, b + y)) puts("No");
+  scanf("%s%s", a, b);
+  n = strlen(a);
+
+  memcpy(a + n, a, n); // 破环成链
+  memcpy(b + n, b, n);
+
+  int ia = get_min(a), ib = get_min(b); // 分别求出 a 和 b 的最小表示法的起始位置
+
+  if (strcmp(a + ia, b + ib)) puts("No");
   else {
     puts("Yes");
-    puts(a + x);
+    puts(a + ia);
   }
+
   return 0;
 }
