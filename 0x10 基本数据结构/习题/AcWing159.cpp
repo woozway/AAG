@@ -3,11 +3,13 @@ using namespace std;
 const int N = 1e4 + 10, M = 80;
 int n, m;
 char str[N][M]; // 存储二维字符矩阵，N 是行数，M 是列数
-bool st[M]; // 状态数组：st[j] = true 表示宽度 j 不能作为整个矩阵的横向循环节
+bool st[M]; // 状态数组：st[j] = true 表示宽度 j 能作为整个矩阵的横向循环节
 int ne[N];
 
 int main() {
   cin >> n >> m;
+
+  memset(st, true, sizeof st);
   for (int i = 1; i <= n; i ++ ) {
     cin >> str[i];
     for (int j = 1; j <= m; j ++ ) { // 枚举候选宽度 j
@@ -23,13 +25,13 @@ int main() {
           }
         if (!is_match) break;
       }
-      if (!is_match) st[j] = true;
+      if (!is_match) st[j] = false;
     }
   }
 
   int width;
   for (int i = 1; i <= m; i ++ )
-    if (!st[i]) {
+    if (st[i]) {
       width = i; // 第一个没有被否定的 j，就是全局最小有效宽度
       break;
     }
